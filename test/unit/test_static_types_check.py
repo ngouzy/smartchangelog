@@ -1,8 +1,8 @@
-import commitmsg
-
 import inspect
 
 from mypy import api
+
+import commitmsg
 
 
 def test_static_type_check_with_mypy():
