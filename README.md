@@ -6,6 +6,7 @@
 
 # INSTALLATION #
 
+Clone this repository.
 To install this commit message syntax checker, you have to copy or make a symbolic link to your `.git/hooks` directory like that:
 
 > `cp commitmsg.py .git/hooks/commit-msg`
