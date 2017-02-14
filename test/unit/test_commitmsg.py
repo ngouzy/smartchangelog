@@ -87,7 +87,7 @@ def test_wrong_msg_with_first_line():
 
 def test_wrong_msg_with_too_long_subject():
     # GIVEN
-    msg = "feat(ui): " + "a" * 80
+    msg = "feat(ui): " + "a" * (CommitMsg.FIRSTLINE_MAX_LENGTH + 1)
     # WHEN
     # THEN
     with pytest.raises(CommitSyntaxError):
@@ -98,7 +98,7 @@ def test_wrong_msg_with_too_long_body():
     # GIVEN
     msg = "feat(ui): add button\n" + \
           "\n" + \
-          "b" * 90
+          "b" * (CommitMsg.BODY_MAX_LENGTH + 1)
     # WHEN
     # THEN
     with pytest.raises(CommitSyntaxError):
@@ -111,7 +111,7 @@ def test_wrong_msg_with_too_long_footer():
           "\n" + \
           "body\n" + \
           "\n" + \
-          "f" * 90
+          "f" * (CommitMsg.FOOTER_MAX_LENGTH + 1)
     # WHEN
     # THEN
     with pytest.raises(CommitSyntaxError):
