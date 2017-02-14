@@ -1,14 +1,6 @@
-import commitmsg
-
-import inspect
 import subprocess
 
-import pytest
-
-
-@pytest.fixture(scope="function")
-def commitmsg_script():
-    return inspect.getfile(commitmsg)
+from . import *
 
 
 # noinspection PyShadowingNames
@@ -25,7 +17,7 @@ def test_help_arg(commitmsg_script):
 
 
 # noinspection PyShadowingNames
-def test_right_msg_arg(commitmsg_script: str):
+def test_right_msg_arg(commitmsg_script):
     # GIVEN
     # WHEN
     completed_process = subprocess.run([commitmsg_script, 'feat(ui): add button'],
