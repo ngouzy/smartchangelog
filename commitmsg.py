@@ -25,7 +25,6 @@ def main() -> None:
         CommitMsg.parse(msg)
     except CommitSyntaxError as e:
         parser.error("{error}\n\n{help}".format(error=e, help=CommitMsg.help()))
-        exit(1)
     exit(0)
 
 

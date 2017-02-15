@@ -1,42 +1,92 @@
-import subprocess
+import sys
+import os
 
 from . import *
 
 
-# noinspection PyShadowingNames
-def test_help_arg(commitmsg_script):
-    # GIVEN
-    # WHEN
-    completed_process = subprocess.run([commitmsg_script, '-h'],
-                                       stdout=subprocess.PIPE,
-                                       encoding="utf-8")
-    # THEN
-    expected = commitmsg.CommitMsg.help().replace(" ", "")
-    actual = completed_process.stdout.replace(" ", "")
-    assert expected in actual
+@pytest.fixture(scope='function')
+def sys_argv():
+    old_sys_argv = sys.argv
+    yield
+    sys.argv = old_sys_argv
+
+
+@pytest.fixture(scope='function')
+def commit_msg_file(filename):
+    yield
 
 
 # noinspection PyShadowingNames
-def test_right_msg_arg(commitmsg_script):
+@pytest.mark.usefixtures("sys_argv")
+def test_help_arg(commitmsg_script, capsys):
     # GIVEN
+    sys.argv = [commitmsg_script, "-h"]
     # WHEN
-    completed_process = subprocess.run([commitmsg_script, 'feat(ui): add button'],
-                                       stderr=subprocess.PIPE,
-                                       encoding="utf-8")
+    with pytest.raises(SystemExit) as e:
+        commitmsg.main()
+    capsys.readouterr()
     # THEN
-    assert completed_process.returncode == 0
-    assert len(completed_process.stderr) == 0
+    assert e.value.code == 0
 
 
 # noinspection PyShadowingNames
-def test_wrong_msg_arg(commitmsg_script):
+@pytest.mark.usefixtures("sys_argv")
+def test_right_msg_arg(commitmsg_script, capsys):
     # GIVEN
+    sys.argv = [commitmsg_script, 'feat(ui): add button']
     # WHEN
-    completed_process = subprocess.run([commitmsg_script, 'wrong commit message'],
-                                       stderr=subprocess.PIPE,
-                                       encoding="utf-8")
+    with pytest.raises(SystemExit) as e:
+        commitmsg.main()
+    capsys.readouterr()
     # THEN
-    assert completed_process.returncode != 0
-    expected = commitmsg.CommitMsg.help().replace(" ", "")
-    actual = completed_process.stderr.replace(" ", "")
-    assert expected in actual
+    assert e.value.code == 0
+
+
+# noinspection PyShadowingNames
+@pytest.mark.usefixtures("sys_argv")
+def test_wrong_msg_arg(commitmsg_script, capsys):
+    # GIVEN
+    sys.argv = [commitmsg_script, 'wrong commit message']
+    # WHEN
+    with pytest.raises(SystemExit) as e:
+        commitmsg.main()
+    capsys.readouterr()
+    assert e.value.code != 0
+
+
+# noinspection PyShadowingNames
+@pytest.mark.usefixtures("sys_argv")
+def test_right_msg_file(commitmsg_script, capsys):
+    # GIVEN
+    filename = 'COMMIT_EDITMSG'
+    sys.argv = [commitmsg_script, filename]
+    with open(filename, 'w') as f:
+        f.write('feat(ui): add button')
+    # WHEN
+    with pytest.raises(SystemExit) as e:
+        commitmsg.main()
+    # THEN
+    assert e.value.code == 0
+    # CLEAN
+    capsys.readouterr()
+    if os.path.isfile(filename):
+        os.remove(filename)
+
+
+# noinspection PyShadowingNames
+@pytest.mark.usefixtures("sys_argv")
+def test_wrong_msg_file(commitmsg_script, capsys):
+    # GIVEN
+    filename = 'COMMIT_EDITMSG'
+    sys.argv = [commitmsg_script, filename]
+    with open(filename, 'w') as f:
+        f.write('bad format')
+    # WHEN
+    with pytest.raises(SystemExit) as e:
+        commitmsg.main()
+    # THEN
+    assert e.value.code != 0
+    # CLEAN
+    capsys.readouterr()
+    if os.path.isfile(filename):
+        os.remove(filename)
