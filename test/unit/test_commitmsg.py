@@ -3,135 +3,158 @@ import pytest
 from commitmsg import CommitMsg, CommitSyntaxError, CommitType
 
 
-def test_right_msg_with_first_line():
-    # GIVEN
-    msg = "feat(ui main): add button"
-    # WHEN
-    commit_msg = CommitMsg.parse(msg)
-    # THEN
-    assert commit_msg.type == CommitType.feat
-    assert commit_msg.scope == "ui main"
-    assert commit_msg.subject == "add button"
-    assert commit_msg.body is None
-    assert commit_msg.footer is None
+class TestParseFirstLine:
+    def test_with_type_and_scope_and_subject(self):
+        # GIVEN
+        firstline = "feat(ui main): add button"
+        # WHEN
+        parsed_firstline = CommitMsg.parse_firstline(firstline)
+        # THEN
+        assert parsed_firstline.type == CommitType.feat
+        assert parsed_firstline.scope == "ui main"
+        assert parsed_firstline.subject == "add button"
+
+    def test_with_firstline_with_type_and_subject_but_without_scope(self):
+        # GIVEN
+        msg = "fix: commit-msg hook exit"
+        # WHEN
+        commit_msg = CommitMsg.parse(msg)
+        # THEN
+        assert commit_msg.type == CommitType.fix
+        assert commit_msg.scope is None
+        assert commit_msg.subject == "commit-msg hook exit"
+
+    def test_with_wrong_firstline_format(self):
+        # GIVEN
+        firstline = "bad message"
+        # WHEN
+        # THEN
+        with pytest.raises(CommitSyntaxError):
+            CommitMsg.parse_firstline(firstline)
+
+    def test_with_unknown_type(self):
+        # GIVEN
+        firstline = "unknown(ui): add button"
+        # WHEN
+        # THEN
+        with pytest.raises(CommitSyntaxError):
+            CommitMsg.parse_firstline(firstline)
+
+    def test_with_too_long_firstline_length(self):
+        # GIVEN
+        firstline = "feat(ui): " + "a" * (CommitMsg.FIRSTLINE_MAX_LENGTH + 1)
+        # WHEN
+        # THEN
+        with pytest.raises(CommitSyntaxError):
+            CommitMsg.parse_firstline(firstline)
 
 
-def test_right_msg_with_first_line_but_without_scope():
-    # GIVEN
-    msg = "fix: commit-msg hook exit"
-    # WHEN
-    commit_msg = CommitMsg.parse(msg)
-    # THEN
-    assert commit_msg.type == CommitType.fix
-    assert commit_msg.scope is None
-    assert commit_msg.subject == "commit-msg hook exit"
-    assert commit_msg.body is None
-    assert commit_msg.footer is None
+class TestParseBody:
+    def test_with_too_long_body_line_length(self):
+        # GIVEN
+        body = "body\n" +\
+               "b" * (CommitMsg.BODY_MAX_LENGTH + 1)
+        # WHEN
+        # THEN
+        with pytest.raises(CommitSyntaxError):
+            CommitMsg.parse_body(body)
+
+    def test_with_one_line_body(self):
+        # GIVEN
+        body = "body"
+        # WHEN
+        actual = CommitMsg.parse_body(body)
+        # THEN
+        assert actual == body
+
+    def test_with_multi_line_body(self):
+        # GIVEN
+        body = "first line body\n" + \
+               "second line body"
+        # WHEN
+        actual = CommitMsg.parse_body(body)
+        # THEN
+        assert actual == body
 
 
-def test_right_msg_with_no_scope():
-    # GIVEN
-    msg = "feat: add button"
-    # WHEN
-    commit_msg = CommitMsg.parse(msg)
-    # THEN
-    assert commit_msg.type == CommitType.feat
-    assert commit_msg.scope is None
-    assert commit_msg.subject == "add button"
-    assert commit_msg.body is None
-    assert commit_msg.footer is None
+class TestParseFooter:
+    def test_with_too_long_footer_line_length(self):
+        # GIVEN
+        footer = "footer\n" +\
+                 "f" * (CommitMsg.FOOTER_MAX_LENGTH + 1)
+        # WHEN
+        # THEN
+        with pytest.raises(CommitSyntaxError):
+            CommitMsg.parse_footer(footer)
+
+    def test_with_one_line_footer(self):
+        # GIVEN
+        footer = "footer"
+        # WHEN
+        actual = CommitMsg.parse_footer(footer)
+        # THEN
+        assert actual == footer
+
+    def test_with_multi_line_footer(self):
+        # GIVEN
+        footer = "first line footer\n" +\
+                 "second line footer"
+        # WHEN
+        actual = CommitMsg.parse_footer(footer)
+        # THEN
+        assert actual == footer
 
 
-def test_right_msg_with_first_line_and_body_():
-    # GIVEN
-    msg = "" + \
-          "feat(ui): add button\n" + \
-          "\n" + \
-          "body first line\n" + \
-          "body second line"
-    # WHEN
-    commit_msg = CommitMsg.parse(msg)
-    # THEN
-    assert commit_msg.type == CommitType.feat
-    assert commit_msg.scope == "ui"
-    assert commit_msg.subject == "add button"
-    assert commit_msg.body == "body first line\nbody second line"
-    assert commit_msg.footer is None
+class TestParse:
+    def test_with_firstline_but_without_body_and_footer(self):
+        # GIVEN
+        msg = "feat: add button"
+        # WHEN
+        commit_msg = CommitMsg.parse(msg)
+        # THEN
+        assert commit_msg.type == CommitType.feat
+        assert commit_msg.scope is None
+        assert commit_msg.subject == "add button"
+        assert commit_msg.body is None
+        assert commit_msg.footer is None
 
+    def test_with_firstline_and_body_but_without_footer(self):
+        # GIVEN
+        msg = "" + \
+              "feat(ui): add button\n" + \
+              "\n" + \
+              "body first line\n" + \
+              "body second line"
+        # WHEN
+        commit_msg = CommitMsg.parse(msg)
+        # THEN
+        assert commit_msg.type == CommitType.feat
+        assert commit_msg.scope == "ui"
+        assert commit_msg.subject == "add button"
+        assert commit_msg.body == "body first line\nbody second line"
+        assert commit_msg.footer is None
 
-def test_right_msg_with_first_line_and_simple_body_and_simple_footer():
-    # GIVEN
-    msg = "feat(ui): add button\n" + \
-          "\n" + \
-          "body\n" + \
-          "\n" + \
-          "footer"
-    # WHEN
-    commit_msg = CommitMsg.parse(msg)
-    # THEN
-    assert commit_msg.type == CommitType.feat
-    assert commit_msg.scope == "ui"
-    assert commit_msg.subject == "add button"
-    assert commit_msg.body == "body"
-    assert commit_msg.footer == "footer"
+    def test_with_firstline_and_body_and_footer(self):
+        # GIVEN
+        msg = "feat(ui): add button\n" + \
+              "\n" + \
+              "body\n" + \
+              "\n" + \
+              "footer"
+        # WHEN
+        commit_msg = CommitMsg.parse(msg)
+        # THEN
+        assert commit_msg.type == CommitType.feat
+        assert commit_msg.scope == "ui"
+        assert commit_msg.subject == "add button"
+        assert commit_msg.body == "body"
+        assert commit_msg.footer == "footer"
 
-
-def test_wrong_msg_with_first_line():
-    # GIVEN
-    msg = "bad message"
-    # WHEN
-    # THEN
-    with pytest.raises(CommitSyntaxError):
-        CommitMsg.parse(msg)
-
-
-def test_wrong_msg_with_too_long_subject():
-    # GIVEN
-    msg = "feat(ui): " + "a" * (CommitMsg.FIRSTLINE_MAX_LENGTH + 1)
-    # WHEN
-    # THEN
-    with pytest.raises(CommitSyntaxError):
-        CommitMsg.parse(msg)
-
-
-def test_wrong_msg_with_too_long_body():
-    # GIVEN
-    msg = "feat(ui): add button\n" + \
-          "\n" + \
-          "b" * (CommitMsg.BODY_MAX_LENGTH + 1)
-    # WHEN
-    # THEN
-    with pytest.raises(CommitSyntaxError):
-        CommitMsg.parse(msg)
-
-
-def test_wrong_msg_with_too_long_footer():
-    # GIVEN
-    msg = "feat(ui): add button\n" + \
-          "\n" + \
-          "body\n" + \
-          "\n" + \
-          "f" * (CommitMsg.FOOTER_MAX_LENGTH + 1)
-    # WHEN
-    # THEN
-    with pytest.raises(CommitSyntaxError):
-        CommitMsg.parse(msg)
-
-
-def test_wrong_msg_with_unknown_type():
-    # GIVEN
-    msg = "unknown(ui): add button"
-    # WHEN
-    # THEN
-    with pytest.raises(CommitSyntaxError):
-        CommitMsg.parse(msg)
-
-
-def test_wrong_msg_with_bad_separator_between_firstline_and_body():
-    # GIVEN
-    msg = "feat(ui): add button\n" + \
-          "body"
-    # WHEN
-    # THEN
-    with pytest.raises(CommitSyntaxError):
-        CommitMsg.parse(msg)
+    def test_wrong_msg_with_bad_separator_between_firstline_and_body(self):
+        # GIVEN
+        msg = "feat(ui): add button\n" + \
+              "body"
+        # WHEN
+        # THEN
+        with pytest.raises(CommitSyntaxError):
+            CommitMsg.parse(msg)

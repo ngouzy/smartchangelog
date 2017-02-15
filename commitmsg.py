@@ -8,6 +8,7 @@ import argparse
 import re
 import inspect
 from enum import Enum
+from typing import NamedTuple
 
 
 def main() -> None:
@@ -42,6 +43,16 @@ class CommitType(Enum):
     refactor = 'refactoring production code, eg.renaming a variable'
     test = 'adding missing tests, refactoring tests; no production code change'
     chore = 'updating gradle scripts, continuous integration scripts,  etc; no production code change'
+
+
+FirstLine = NamedTuple(
+    'FirstLine',
+    [
+        ('type', CommitType),
+        ('scope', str),
+        ('subject', str)
+    ]
+)
 
 
 class CommitMsg:
@@ -98,27 +109,27 @@ class CommitMsg:
     @staticmethod
     def parse(msg: str) -> 'CommitMsg':
         msg_parts = msg.split("\n\n")
-        firstline = msg_parts[0]
-        if len(firstline) > CommitMsg.FIRSTLINE_MAX_LENGTH:
-            raise CommitSyntaxError("First line can not be greater than {length} characters".format(
-                length=CommitMsg.FIRSTLINE_MAX_LENGTH))
+        firstline = CommitMsg.parse_firstline(msg_parts[0])
         if len(msg_parts) > 1:
             body = msg_parts[1]
-            for line in body.split('\n'):
-                if len(line) > CommitMsg.BODY_MAX_LENGTH:
-                    raise CommitSyntaxError("Body line can not be greater than {length} characters".format(
-                        length=CommitMsg.BODY_MAX_LENGTH))
+            CommitMsg.parse_body(body)
         else:
             body = None
         if len(msg_parts) > 2:
             footer = msg_parts[2]
-            for line in footer.split('\n'):
-                if len(line) > CommitMsg.FOOTER_MAX_LENGTH:
-                    raise CommitSyntaxError("Footer line can not be greater than {length} characters".format(
-                        length=CommitMsg.FOOTER_MAX_LENGTH))
+            CommitMsg.parse_footer(footer)
         else:
             footer = None
+        return CommitMsg(firstline.type, firstline.scope, firstline.subject, body, footer)
+
+    @staticmethod
+    def parse_firstline(firstline: str) -> FirstLine:
+        if len(firstline) > CommitMsg.FIRSTLINE_MAX_LENGTH:
+            raise CommitSyntaxError("First line can not be greater than {length} characters".format(
+                length=CommitMsg.FIRSTLINE_MAX_LENGTH))
         result = CommitMsg.FIRSTLINE_PATTERN.search(firstline)
+        if "\n" in firstline.strip():
+            raise CommitSyntaxError("Two blank lines have to separate the first line and body part")
         if result is None:
             raise CommitSyntaxError("{firstline} doesn't follow the first line commit message pattern: {pattern}"
                                     .format(firstline=firstline, pattern=CommitMsg.FIRSTLINE_PATTERN.pattern))
@@ -127,7 +138,23 @@ class CommitMsg:
             commit_type = CommitType[commit_type_str]
         except KeyError:
             raise CommitSyntaxError("{commit_type} is not an available commit type".format(commit_type=commit_type_str))
-        return CommitMsg(commit_type, scope, subject, body, footer)
+        return FirstLine(type=commit_type, scope=scope, subject=subject)
+
+    @staticmethod
+    def parse_body(body: str) -> str:
+        for line in body.split('\n'):
+            if len(line) > CommitMsg.BODY_MAX_LENGTH:
+                raise CommitSyntaxError("Body line can not be greater than {length} characters".format(
+                    length=CommitMsg.BODY_MAX_LENGTH))
+        return body
+
+    @staticmethod
+    def parse_footer(footer: str) -> str:
+        for line in footer.split('\n'):
+            if len(line) > CommitMsg.FOOTER_MAX_LENGTH:
+                raise CommitSyntaxError("Footer line can not be greater than {length} characters".format(
+                    length=CommitMsg.FOOTER_MAX_LENGTH))
+        return footer
 
     @staticmethod
     def format_allowed_types() -> str:
