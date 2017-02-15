@@ -22,8 +22,8 @@ def main() -> None:
             msg = msg_file.read()
     try:
         CommitMsg.parse(msg)
-    except CommitSyntaxError:
-        parser.error(CommitMsg.help())
+    except CommitSyntaxError as e:
+        parser.error("{error}\n\n{help}".format(error=e, help=CommitMsg.help()))
         exit(1)
     exit(0)
 
@@ -46,8 +46,6 @@ class CommitType(Enum):
 
 class CommitMsg:
     """
-    Commit message
-
     Your commit message have to follow this format:
     <type>(<scope>): <subject>
 
