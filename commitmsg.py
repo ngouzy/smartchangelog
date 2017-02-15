@@ -85,7 +85,7 @@ class CommitMsg:
         the footer.
         The footer cannot be longer than {footerline_max_length} characters.
     """
-    FIRSTLINE_PATTERN = re.compile("^([a-z]+)(?:\(([a-z]+)\))?: (.+)$")
+    FIRSTLINE_PATTERN = re.compile("^([a-z]+)(?:\(([^\n\t]+)\))?: (.+)$")
     FIRSTLINE_MAX_LENGTH = 70
     BODY_MAX_LENGTH = 80
     FOOTER_MAX_LENGTH = 80
@@ -122,7 +122,8 @@ class CommitMsg:
             footer = None
         result = CommitMsg.FIRSTLINE_PATTERN.search(firstline)
         if result is None:
-            raise CommitSyntaxError("{firstline} doesn't follow the commit message pattern")
+            raise CommitSyntaxError("{firstline} doesn't follow the first line commit message pattern: {pattern}"
+                                    .format(firstline=firstline, pattern=CommitMsg.FIRSTLINE_PATTERN.pattern))
         commit_type_str, scope, subject = result.groups()
         try:
             commit_type = CommitType[commit_type_str]

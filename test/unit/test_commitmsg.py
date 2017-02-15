@@ -5,12 +5,12 @@ from commitmsg import CommitMsg, CommitSyntaxError, CommitType
 
 def test_right_msg_with_first_line():
     # GIVEN
-    msg = "feat(ui): add button"
+    msg = "feat(ui main): add button"
     # WHEN
     commit_msg = CommitMsg.parse(msg)
     # THEN
     assert commit_msg.type == CommitType.feat
-    assert commit_msg.scope == "ui"
+    assert commit_msg.scope == "ui main"
     assert commit_msg.subject == "add button"
     assert commit_msg.body is None
     assert commit_msg.footer is None
