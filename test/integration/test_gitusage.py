@@ -7,7 +7,7 @@ from typing import List
 from . import *
 
 
-def git_command(*git_args: List) -> subprocess.CompletedProcess:
+def git_command(*git_args: List[str]) -> subprocess.CompletedProcess:
     args = ['git'] + list(git_args)
     completed_process = subprocess.run(args,
                                        stdout=subprocess.PIPE,
@@ -20,7 +20,8 @@ def git_command(*git_args: List) -> subprocess.CompletedProcess:
 @pytest.fixture(scope='function')
 def temp_dir(commitmsg_script):
     temporary_directory = tempfile.mkdtemp()
-    with open(file=os.path.join(temporary_directory, "sample_file.txt"), mode="w") as sample_file:
+    sample_file_path = os.path.join(temporary_directory, "sample_file.txt")
+    with open(sample_file_path, mode="w") as sample_file:
         sample_file.write("sample content")
     old_cwd = os.getcwd()
     os.chdir(temporary_directory)

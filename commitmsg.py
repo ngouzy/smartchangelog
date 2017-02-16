@@ -11,23 +11,6 @@ from enum import Enum
 from typing import NamedTuple
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Git commit message checker",
-                                     formatter_class=argparse.RawDescriptionHelpFormatter,
-                                     epilog=CommitMsg.help())
-    parser.add_argument("msg", help="the commit message to check")
-    args = parser.parse_args()
-    msg = args.msg
-    if "COMMIT_EDITMSG" in msg:
-        with open(args.msg) as msg_file:
-            msg = msg_file.read()
-    try:
-        CommitMsg.parse(msg)
-    except CommitSyntaxError as e:
-        parser.error("{error}\n\n{help}".format(error=e, help=CommitMsg.help()))
-    exit(0)
-
-
 class CommitSyntaxError(Exception):
     """
     Invalid commit syntax error
@@ -43,15 +26,6 @@ class CommitType(Enum):
     test = 'adding missing tests, refactoring tests; no production code change'
     chore = 'updating gradle scripts, continuous integration scripts,  etc; no production code change'
 
-
-# FirstLine = NamedTuple(
-#     'FirstLine',
-#     [
-#         ('type', CommitType),
-#         ('scope', str),
-#         ('subject', str)
-#     ]
-# )
 
 class FirstLine(NamedTuple):
     type: CommitType
@@ -98,7 +72,7 @@ class CommitMsg:
         the footer.
         The footer cannot be longer than {footerline_max_length} characters.
     """
-    FIRSTLINE_PATTERN = re.compile("^([a-z]+)(?:\(([^\n\t]+)\))?: (.+)$")
+    FIRSTLINE_PATTERN = re.compile('^([a-z]+)(?:\(([^\n\t]+)\))?: (.+)$')
     FIRSTLINE_MAX_LENGTH = 70
     BODY_MAX_LENGTH = 80
     FOOTER_MAX_LENGTH = 80
@@ -170,6 +144,23 @@ class CommitMsg:
                                                 firstline_max_length=CommitMsg.FIRSTLINE_MAX_LENGTH,
                                                 bodyline_max_length=CommitMsg.BODY_MAX_LENGTH,
                                                 footerline_max_length=CommitMsg.FOOTER_MAX_LENGTH)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Git commit message checker",
+                                     formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     epilog=CommitMsg.help())
+    parser.add_argument("msg", help="the commit message to check")
+    args = parser.parse_args()
+    msg = args.msg
+    if "COMMIT_EDITMSG" in msg:
+        with open(args.msg) as msg_file:
+            msg = msg_file.read()
+    try:
+        CommitMsg.parse(msg)
+    except CommitSyntaxError as e:
+        parser.error("{error}\n\n{help}".format(error=e, help=CommitMsg.help()))
+    exit(0)
 
 
 if __name__ == "__main__":
