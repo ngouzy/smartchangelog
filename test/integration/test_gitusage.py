@@ -41,6 +41,8 @@ def temp_dir(commitmsg_script):
     shutil.copy(commitmsg_script, git_hook_commit_msg_path)
     assert os.path.isfile(git_hook_commit_msg_path)
 
+    os.chmod(git_hook_commit_msg_path, 0o755)
+
     completed_process = git_command('add', '.')
     assert completed_process.returncode == 0
     assert len(completed_process.stderr) == 0
