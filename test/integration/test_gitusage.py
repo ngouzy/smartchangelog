@@ -33,6 +33,10 @@ def temp_dir(commitmsg_script):
     assert completed_process.returncode == 0
     assert len(completed_process.stderr) == 0
 
+    completed_process = git_command('config', 'user.email', 'nicolas.gouzy@gmail.com')
+    assert completed_process.returncode == 0
+    assert len(completed_process.stderr) == 0
+
     git_hook_commit_msg_path = os.path.join(temporary_directory, ".git", "hooks", "commit-msg")
     shutil.copy(commitmsg_script, git_hook_commit_msg_path)
     completed_process = git_command('add', '.')
