@@ -44,14 +44,19 @@ class CommitType(Enum):
     chore = 'updating gradle scripts, continuous integration scripts,  etc; no production code change'
 
 
-FirstLine = NamedTuple(
-    'FirstLine',
-    [
-        ('type', CommitType),
-        ('scope', str),
-        ('subject', str)
-    ]
-)
+# FirstLine = NamedTuple(
+#     'FirstLine',
+#     [
+#         ('type', CommitType),
+#         ('scope', str),
+#         ('subject', str)
+#     ]
+# )
+
+class FirstLine(NamedTuple):
+    type: CommitType
+    scope: str
+    subject: str
 
 
 class CommitMsg:

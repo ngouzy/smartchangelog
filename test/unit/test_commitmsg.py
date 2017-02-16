@@ -18,11 +18,11 @@ class TestParseFirstLine:
         # GIVEN
         msg = "fix: commit-msg hook exit"
         # WHEN
-        commit_msg = CommitMsg.parse(msg)
+        firstline = CommitMsg.parse_firstline(msg)
         # THEN
-        assert commit_msg.type == CommitType.fix
-        assert commit_msg.scope is None
-        assert commit_msg.subject == "commit-msg hook exit"
+        assert firstline.type == CommitType.fix
+        assert firstline.scope is None
+        assert firstline.subject == "commit-msg hook exit"
 
     def test_with_wrong_firstline_format(self):
         # GIVEN

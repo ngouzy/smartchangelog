@@ -7,7 +7,7 @@ import commitmsg
 
 def test_static_type_check_with_mypy():
     current_file = inspect.getfile(commitmsg)
-    params = '{file} --ignore-missing-imports'.format(file=current_file)
+    params = ' '.join(['--ignore-missing-imports', '--fast-parser', '--python-version', ' 3.6 ', current_file])
     result = api.run(params)
     if result[0]:
         # FIXME: begin: There is a bug in mypy version 0.471 about support iteration on enums
