@@ -1,7 +1,10 @@
 import sys
 import os
 
-from . import *
+import pytest
+
+import commitmsg
+from test.support import commitmsg_script_path
 
 
 @pytest.fixture(scope='function')
@@ -11,16 +14,11 @@ def sys_argv():
     sys.argv = old_sys_argv
 
 
-@pytest.fixture(scope='function')
-def commit_msg_file(filename):
-    yield
-
-
 # noinspection PyShadowingNames
 @pytest.mark.usefixtures("sys_argv")
-def test_help_arg(commitmsg_script, capsys):
+def test_help_arg(capsys):
     # GIVEN
-    sys.argv = [commitmsg_script, "-h"]
+    sys.argv = [commitmsg_script_path, "-h"]
     # WHEN
     with pytest.raises(SystemExit) as e:
         commitmsg.main()
@@ -31,9 +29,9 @@ def test_help_arg(commitmsg_script, capsys):
 
 # noinspection PyShadowingNames
 @pytest.mark.usefixtures("sys_argv")
-def test_right_msg_arg(commitmsg_script, capsys):
+def test_right_msg_arg(capsys):
     # GIVEN
-    sys.argv = [commitmsg_script, 'feat(ui): add button']
+    sys.argv = [commitmsg_script_path, 'feat(ui): add button']
     # WHEN
     with pytest.raises(SystemExit) as e:
         commitmsg.main()
@@ -44,9 +42,9 @@ def test_right_msg_arg(commitmsg_script, capsys):
 
 # noinspection PyShadowingNames
 @pytest.mark.usefixtures("sys_argv")
-def test_wrong_msg_arg(commitmsg_script, capsys):
+def test_wrong_msg_arg(capsys):
     # GIVEN
-    sys.argv = [commitmsg_script, 'wrong commit message']
+    sys.argv = [commitmsg_script_path, 'wrong commit message']
     # WHEN
     with pytest.raises(SystemExit) as e:
         commitmsg.main()
@@ -56,10 +54,10 @@ def test_wrong_msg_arg(commitmsg_script, capsys):
 
 # noinspection PyShadowingNames
 @pytest.mark.usefixtures("sys_argv")
-def test_right_msg_file(commitmsg_script, capsys):
+def test_right_msg_file(capsys):
     # GIVEN
     filename = 'COMMIT_EDITMSG'
-    sys.argv = [commitmsg_script, filename]
+    sys.argv = [commitmsg_script_path, filename]
     with open(filename, 'w') as f:
         f.write('feat(ui): add button')
     # WHEN
@@ -75,10 +73,10 @@ def test_right_msg_file(commitmsg_script, capsys):
 
 # noinspection PyShadowingNames
 @pytest.mark.usefixtures("sys_argv")
-def test_wrong_msg_file(commitmsg_script, capsys):
+def test_wrong_msg_file(capsys):
     # GIVEN
     filename = 'COMMIT_EDITMSG'
-    sys.argv = [commitmsg_script, filename]
+    sys.argv = [commitmsg_script_path, filename]
     with open(filename, 'w') as f:
         f.write('bad format')
     # WHEN
