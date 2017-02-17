@@ -27,26 +27,26 @@ class TestParseFirstLine:
     def test_with_wrong_firstline_format(self):
         # GIVEN
         firstline = "bad message"
-        # WHEN
-        # THEN
         with pytest.raises(CommitSyntaxError):
+            # WHEN
             CommitMsg.parse_firstline(firstline)
+        # THEN CommitSyntaxError is raised
 
     def test_with_unknown_type(self):
         # GIVEN
         firstline = "unknown(ui): add button"
-        # WHEN
-        # THEN
         with pytest.raises(CommitSyntaxError):
+            # WHEN
             CommitMsg.parse_firstline(firstline)
+        # THEN CommitSyntaxError is raised
 
     def test_with_too_long_firstline_length(self):
         # GIVEN
         firstline = "feat(ui): " + "a" * (CommitMsg.FIRSTLINE_MAX_LENGTH + 1)
-        # WHEN
-        # THEN
         with pytest.raises(CommitSyntaxError):
+            # WHEN
             CommitMsg.parse_firstline(firstline)
+        # THEN CommitSyntaxError is raised
 
 
 class TestParseBody:
@@ -54,10 +54,10 @@ class TestParseBody:
         # GIVEN
         body = "body\n" +\
                "b" * (CommitMsg.BODY_MAX_LENGTH + 1)
-        # WHEN
-        # THEN
         with pytest.raises(CommitSyntaxError):
+            # WHEN
             CommitMsg.parse_body(body)
+        # THEN CommitSyntaxError is raised
 
     def test_with_one_line_body(self):
         # GIVEN
@@ -82,10 +82,10 @@ class TestParseFooter:
         # GIVEN
         footer = "footer\n" +\
                  "f" * (CommitMsg.FOOTER_MAX_LENGTH + 1)
-        # WHEN
-        # THEN
         with pytest.raises(CommitSyntaxError):
+            # WHEN
             CommitMsg.parse_footer(footer)
+        # THEN CommitSyntaxError is raised
 
     def test_with_one_line_footer(self):
         # GIVEN
@@ -154,7 +154,7 @@ class TestParse:
         # GIVEN
         msg = "feat(ui): add button\n" + \
               "body"
-        # WHEN
-        # THEN
-        with pytest.raises(CommitSyntaxError):
+        with pytest.raises(CommitSyntaxError) as e:
+            # WHEN
             CommitMsg.parse(msg)
+        # THEN CommitSyntaxError is raised

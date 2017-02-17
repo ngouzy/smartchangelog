@@ -7,7 +7,6 @@ import pytest
 from test.support import commitmsg_script_path, git_command
 
 
-# noinspection PyShadowingNames
 @pytest.fixture(scope='function')
 def temp_dir():
     temporary_directory = tempfile.mkdtemp()
@@ -36,7 +35,10 @@ def temp_dir():
 
 @pytest.mark.usefixtures("temp_dir")
 def test_git_commit_with_right_msg():
+    # GIVEN
+    # WHEN
     git_command('commit', '-m', 'feat(ui): sample')
+    # THEN
 
 
 @pytest.mark.usefixtures("temp_dir")
