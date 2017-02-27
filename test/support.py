@@ -3,7 +3,7 @@ import subprocess
 import sys
 import os
 from contextlib import contextmanager
-from typing import List, Iterator, TextIO
+from typing import List, Tuple, Iterator, TextIO, cast
 from io import StringIO
 
 import commitmsg
@@ -12,12 +12,11 @@ import commitmsg
 commitmsg_script_path = inspect.getfile(commitmsg)
 
 
-def git_command(*git_args: List[str]) -> subprocess.CompletedProcess:
-    args = ['git'] + list(git_args)
+def git_command(*git_args: Tuple[str]) -> subprocess.CompletedProcess:
+    args = ['git'] + cast(List[str], list(git_args))
     completed_process = subprocess.run(args,
                                        stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE,
-                                       encoding="utf-8")
+                                       stderr=subprocess.PIPE)
     assert completed_process.returncode == 0
     assert len(completed_process.stderr) == 0
     return completed_process
@@ -29,7 +28,7 @@ def set_commit_editmsg(msg: str) -> Iterator[TextIO]:
     with open(filename, mode='w') as f:
         f.write(msg)
     try:
-        yield f
+        yield cast(TextIO, f)
     finally:
         if os.path.isfile(filename):
             os.remove(filename)
