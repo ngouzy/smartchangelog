@@ -7,10 +7,10 @@ import commitmsg
 
 def test_static_type_check_with_mypy():
     commitmsg_file = inspect.getfile(commitmsg)
-    params = ' '.join(['--ignore-missing-imports', '--fast-parser', '--python-version', ' 3.6 ', commitmsg_file])
+    params = ['--ignore-missing-imports', commitmsg_file]
     result = api.run(params)
     if result[0]:
-        # FIXME: begin: There is a bug in mypy version 0.471 about support iteration on enums
+        # FIXME: begin: There is a bug in mypy about support iteration on enums
         # see https://github.com/python/mypy/issues/2305
         # So, we have to remove irrelevant errors
         check_type_errors = "\n".join(
