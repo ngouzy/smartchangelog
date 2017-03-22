@@ -30,7 +30,7 @@ class TestParseFirstLine:
         with pytest.raises(CommitSyntaxError):
             # WHEN
             CommitMsg.parse_firstline(firstline)
-        # THEN CommitSyntaxError is raised
+            # THEN CommitSyntaxError is raised
 
     def test_with_unknown_type(self):
         # GIVEN
@@ -38,7 +38,7 @@ class TestParseFirstLine:
         with pytest.raises(CommitSyntaxError):
             # WHEN
             CommitMsg.parse_firstline(firstline)
-        # THEN CommitSyntaxError is raised
+            # THEN CommitSyntaxError is raised
 
     def test_with_too_long_firstline_length(self):
         # GIVEN
@@ -46,18 +46,18 @@ class TestParseFirstLine:
         with pytest.raises(CommitSyntaxError):
             # WHEN
             CommitMsg.parse_firstline(firstline)
-        # THEN CommitSyntaxError is raised
+            # THEN CommitSyntaxError is raised
 
 
 class TestParseBody:
     def test_with_too_long_body_line_length(self):
         # GIVEN
-        body = "body\n" +\
+        body = "body\n" + \
                "b" * (CommitMsg.BODY_MAX_LENGTH + 1)
         with pytest.raises(CommitSyntaxError):
             # WHEN
             CommitMsg.parse_body(body)
-        # THEN CommitSyntaxError is raised
+            # THEN CommitSyntaxError is raised
 
     def test_with_one_line_body(self):
         # GIVEN
@@ -80,12 +80,12 @@ class TestParseBody:
 class TestParseFooter:
     def test_with_too_long_footer_line_length(self):
         # GIVEN
-        footer = "footer\n" +\
+        footer = "footer\n" + \
                  "f" * (CommitMsg.FOOTER_MAX_LENGTH + 1)
         with pytest.raises(CommitSyntaxError):
             # WHEN
             CommitMsg.parse_footer(footer)
-        # THEN CommitSyntaxError is raised
+            # THEN CommitSyntaxError is raised
 
     def test_with_one_line_footer(self):
         # GIVEN
@@ -97,7 +97,7 @@ class TestParseFooter:
 
     def test_with_multi_line_footer(self):
         # GIVEN
-        footer = "first line footer\n" +\
+        footer = "first line footer\n" + \
                  "second line footer"
         # WHEN
         actual = CommitMsg.parse_footer(footer)
@@ -157,4 +157,56 @@ class TestParse:
         with pytest.raises(CommitSyntaxError) as e:
             # WHEN
             CommitMsg.parse(msg)
-        # THEN CommitSyntaxError is raised
+            # THEN CommitSyntaxError is raised
+
+
+class TestEquality:
+    def test_equality_with_same_commitmsg(self):
+        # GIVEN
+        cm1 = CommitMsg(
+            msg_type=CommitType.feat,
+            scope='conso',
+            subject='OEM-372',
+            body='add field for nbAlerts'
+        )
+        cm2 = CommitMsg(
+            msg_type=CommitType.feat,
+            scope='conso',
+            subject='OEM-372',
+            body='add field for nbAlerts'
+        )
+        # WHEN
+        # THEN
+        assert cm1 == cm2
+
+    def test_equality_with_other_commitmsg(self):
+        # GIVEN
+        cm1 = CommitMsg(
+            msg_type=CommitType.feat,
+            scope='conso',
+            subject='OEM-372',
+            body='add field for nbAlerts'
+        )
+        cm2 = CommitMsg(
+            msg_type=CommitType.fix,
+            scope='conso',
+            subject='OEM-372',
+            body='add field for nbAlerts'
+        )
+        # WHEN
+        # THEN
+        assert cm1 != cm2
+
+    def test_equality_with_other_class(self):
+        # GIVEN
+        cm = CommitMsg(
+            msg_type=CommitType.feat,
+            scope='conso',
+            subject='OEM-372',
+            body='add field for nbAlerts'
+        )
+        s = "a string"
+        # WHEN
+        # THEN
+        assert cm != s
+
