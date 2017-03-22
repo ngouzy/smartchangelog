@@ -1,4 +1,5 @@
 import re
+from commitmsg import CommitMsg, CommitSyntaxError
 from datetime import datetime
 from typing import List
 
@@ -16,11 +17,16 @@ class DateUtil:
 
 
 class Commit:
-    def __init__(self, commit_id: str, author: str, date: datetime, message: str) -> None:
+    def __init__(self, commit_id: str, author: str, date: datetime,
+                 message: CommitMsg = None, raw_message: str = None) -> None:
         self.commit_id = commit_id
         self.author = author
         self.date = date
-        self.message = message
+        if raw_message:
+            self.raw_message = raw_message
+        if message:
+            self.message = message
+            self.raw_message = None
 
     @classmethod
     def parse(cls, commit: str) -> 'Commit':
@@ -28,17 +34,23 @@ class Commit:
                      'Date: (?P<date>.*)(?P<message>(.|\n)*)',
                      commit)
         gd = m.groupdict()
-        message = "\n".join(line.strip() for line in gd['message'].split('\n'))
+        raw_message = "\n".join(line.strip() for line in gd['message'].strip('\n').split('\n'))
+        try:
+            message = CommitMsg.parse(raw_message)
+        except CommitSyntaxError:
+            message = None
         return Commit(commit_id=gd['commit_id'],
                       author=gd['author'],
                       date=DateUtil.str2date(gd['date'].strip()),
-                      message=message.strip('\n'))
+                      message=message,
+                      raw_message=raw_message)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
         return NotImplemented
 
 
-def parse(log: str) -> List[str]:
-    return re.findall('(commit [a-z0-9]{40}\n(?:.|\n)*?)(?=commit|$)', log)
+def parse(log: str) -> List[Commit]:
+    raw_commits = re.findall('(commit [a-z0-9]{40}\n(?:.|\n)*?)(?=commit|$)', log)
+    return [Commit.parse(rc) for rc in raw_commits]
