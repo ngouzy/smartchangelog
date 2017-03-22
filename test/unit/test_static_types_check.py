@@ -3,11 +3,13 @@ import inspect
 from mypy import api
 
 import commitmsg
+import changelog
 
 
 def test_static_type_check_with_mypy():
     commitmsg_file = inspect.getfile(commitmsg)
-    params = ['--ignore-missing-imports', commitmsg_file]
+    changelog_file = inspect.getfile(changelog)
+    params = ['--ignore-missing-imports', commitmsg_file, changelog_file]
     result = api.run(params)
     if result[0]:
         # FIXME: begin: There is a bug in mypy about support iteration on enums
