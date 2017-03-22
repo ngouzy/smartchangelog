@@ -1,7 +1,7 @@
 import re
 from commitmsg import CommitMsg, CommitSyntaxError
 from datetime import datetime
-from typing import List
+from typing import List, Dict
 
 
 class DateUtil:
@@ -24,9 +24,10 @@ class Commit:
         self.date = date
         if raw_message:
             self.raw_message = raw_message
+            self.message = None # type: CommitMsg
         if message:
             self.message = message
-            self.raw_message = None
+            self.raw_message = None  # type: str
 
     @classmethod
     def parse(cls, commit: str) -> 'Commit':
@@ -51,6 +52,19 @@ class Commit:
         return NotImplemented
 
 
-def parse(log: str) -> List[Commit]:
-    raw_commits = re.findall('(commit [a-z0-9]{40}\n(?:.|\n)*?)(?=commit|$)', log)
-    return [Commit.parse(rc) for rc in raw_commits]
+class Changelog(List[Commit]):
+    @classmethod
+    def parse(cls, log: str) -> 'Changelog':
+        raw_commits = re.findall('(commit [a-z0-9]{40}\n(?:.|\n)*?)(?=commit|$)', log)
+        return Changelog([Commit.parse(rc) for rc in raw_commits])
+
+    def pretty(self) -> Dict[str, List[Commit]]:
+        dico: Dict[str, List[Commit]] = {}
+        for c in self:
+            if c.message:
+                key = str(c.message.type)
+            else:
+                key = "unknown"
+            dico[key] = dico.get(key, []) + [c]
+        return dico
+

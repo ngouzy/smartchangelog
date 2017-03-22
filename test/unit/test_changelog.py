@@ -1,6 +1,7 @@
-from changelog import parse, Commit, DateUtil
+from changelog import Changelog, Commit, DateUtil
 from commitmsg import CommitMsg, CommitType
 
+from typing import List
 from datetime import datetime, timezone, timedelta
 import inspect
 import os
@@ -113,8 +114,8 @@ class TestCommit:
         assert c != s
 
 
-class TestParse:
-    def test_parser(self):
+class TestChangelog:
+    def test_parse(self):
         # GIVEN
         with open(logfile_path('big.log'), encoding='utf-8') as logfile:
             log = logfile.read()
@@ -136,11 +137,23 @@ class TestParse:
             )
         )
         # WHEN
-        commits = parse(log)
+        commits = Changelog.parse(log)
         # THEN
         assert (len(commits) == 107)
         assert commits[0] == expected_commit_with_raw_message
         assert commits[1] == expected_commit_with_message
+
+    def test_pretty(self):
+        # GIVEN
+        with open(logfile_path('big.log'), encoding='utf-8') as logfile:
+            log = logfile.read()
+        changelog = Changelog.parse(log)
+        types = ['unknown'] + [str(msg_type) for msg_type in CommitType]
+        # WHEN
+        pretty_changelog = changelog.pretty()
+        # THEN
+        for msg_type in pretty_changelog.keys():
+            assert msg_type in types
 
 
 # Tools
