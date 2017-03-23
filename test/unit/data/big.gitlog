@@ -1,0 +1,211 @@
+commit a6f79b56acbb9e58327ecf91feed611bb614927f
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-23 17:30:56 +0100
+
+    refactor(changelog): better model
+
+    NamedTuple rocks !
+
+commit 597ec5676235e18f5a607726603df944da5be7fe
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-22 15:28:45 +0100
+
+    Merge branch develop into master
+
+commit 82e3d1519ca2dbd39c15796dd2c8e613e1155961
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-22 11:15:14 +0100
+
+    test(static): change log is now under mypy check
+
+commit d71b99d86402f196f3f1b9f0cd7020e9ba69bd85
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-22 11:14:18 +0100
+
+    feat(changelog): parsers rock
+
+commit 9b88c7c7c7b055a571cd1cfa26a8927623ce2c9f
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-22 11:13:14 +0100
+
+    test(equality): test equality of CommitMsg
+
+commit ea72e1939ec55afda9ce04e1b94708710da53253
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-22 11:10:52 +0100
+
+    refactor(commitmsg): use @classmethod instead of @staticmethod
+
+commit 706d3977e4496d9410e50a1c94b1bdab0614bea0
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-21 23:28:11 +0100
+
+    feat(changelog): wip
+
+commit 160f2521fb9006b1ddf5bfaae67f353d3aae3d5a
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-20 10:12:19 +0100
+
+    refactor(test): remove unnecessary mypy parameters
+
+commit 580ea4fcaff23e4af59e9ca8149824252d398991
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-27 11:33:24 +0100
+
+    chore: cleaning
+
+commit 779222f6b6e2c5f1518be92cb99a30e71908a7ed
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-17 17:02:33 +0100
+
+    test(refactor): improve coding style
+
+commit e6cd82f28c4067e9bbb9de5e7cfe17d6d6b67946
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-17 12:11:12 +0100
+
+    test(refactor):  git_command
+
+commit 042c36d4d649c7610b7873123686299ee1bbe005
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-16 17:33:28 +0100
+
+    style: some coding style improvements
+
+commit 7cdd438e8ae54a2c938e5005cf50c92fd7701663
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-16 15:18:47 +0100
+
+    refactor: use new NamedTuple syntax
+
+commit 8ec3e8342e4bbeddb944cbc7a8a0fae2e1096e7f
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-16 13:47:36 +0100
+
+    docs: add CI build status icon
+
+commit 81df0da7447f48eaccea94fd818847808cfcde6e
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-16 11:57:09 +0100
+
+    chore: change shebang
+
+commit 6e279a85ddb48eb51c93add79c7b9bb394cec4bd
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-16 11:38:10 +0100
+
+    test(fix): chmod 755 on commit-msg hook script
+
+commit f156aa265f6b1aa601a2e2ed9155b44c7288e80e
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-16 11:29:03 +0100
+
+    test(fix): test if commit-msg hook file exists
+
+commit 7aa2ef6a88a2f903a0b1c69e8a3ea535125116f6
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-16 11:18:27 +0100
+
+    test(fix): git identity
+
+commit 83432472199a8f367e1bf7e0c36d70c909ac75d4
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-16 11:11:47 +0100
+
+    test(refactor): git command
+
+commit c69cccce671162ae068c83f80f73285b5bd5064e
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-16 10:21:14 +0100
+
+    chore(test): add pytest-cov as test requirement
+
+commit 120e38771046ff6ed3f6792ef4f4c31bb6cfe716
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-16 10:18:14 +0100
+
+    chore(test): rename test requirements file
+
+commit 545b60746b13179601ac457a8af88c423bfbd5a3
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-16 10:15:55 +0100
+
+    chore(CI): add Travis configuration file
+
+commit 7d452a2d3b10cb3446c1f14b67b7ae96afe07614
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-16 09:11:41 +0100
+
+    chore(coverage): add coverage config file
+
+commit ae122ba8221c6ccc24d0f81bec8fc610e222ad5d
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-15 18:23:09 +0100
+
+    test(integration): improve test coverage
+
+commit 3b0b9239c23a4b95e2dbe9ebe2015deb9fc21cdf
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-15 14:15:35 +0100
+
+    refactor: modularize parse method
+
+commit 903414908e91ddb76f00c1e6585fc6bbf728613c
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-15 11:12:40 +0100
+
+    feat(help): improve the help message when there is a format error
+
+commit 489a9e2b758cf9fc2a471ea997d0604cd3aad3b7
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-15 09:35:28 +0100
+
+    fix(scope): tune the pattern to make the scope check less restricted
+
+commit 5ce7cc48f4e131b05cc663d7f87332183b5c203b
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-14 16:30:16 +0100
+
+    test(integration): add git commit tests
+
+commit a86b3893a46c1ff2151b529abd4d6e38d1056449
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-14 16:29:23 +0100
+
+    test(unit): reformat code
+
+commit 5d0d4fd2ce7f43b684dfd591f06db4ae358fcc48
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-14 14:56:35 +0100
+
+    test(integration): tests for script commitmsg.py
+
+commit 8ba7bf22d13d661a7e4b98c9f61ab5dff517d2ea
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-14 14:51:01 +0100
+
+    test(unit): improve tests about max lengths
+
+commit f10f2547888589cbacda1a603707bd429d4b71fc
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-14 13:38:51 +0100
+
+    test: split unit tests
+
+commit 0791449a4189782378d9f25482b74ac7dba403fc
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-14 10:59:19 +0100
+
+    docs: fix README.md
+
+commit 8a4bbd945904817030e7836808563123c3afb192
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-14 10:14:21 +0100
+
+    test(refactoring): split test outside code
+
+commit aa74820f78fc28d272282f152e0445bae3e3a99e
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-02-14 09:50:07 +0100
+
+    test(mypy): add a unit test to check types statically

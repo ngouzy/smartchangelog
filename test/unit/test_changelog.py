@@ -45,16 +45,16 @@ class TestDateUtil:
 class TestCommit:
     def test_parse(self):
         # GIVEN
-        with open(data_file_path('one.log'), encoding='utf-8') as logfile:
+        with open(data_file_path('one.gitlog'), encoding='utf-8') as logfile:
             log = logfile.read()
         expected = Commit(
-            commit_id='2d6b8b7d11cea43bab36da37afdca3c300f92333',
-            author='Vincent Boesch <vincent.boesch@orange.com>',
-            date=DateUtil.str2date('2017-03-21 14:45:48 +0100'),
-            type=CommitType.feat,
-            scope='conso',
-            subject='OEM-372',
-            body='add field for nbAlerts',
+            commit_id='a6f79b56acbb9e58327ecf91feed611bb614927f',
+            author='Nicolas Gouzy <nicolas.gouzy@orange.com>',
+            date=DateUtil.str2date('2017-03-23 17:30:56 +0100'),
+            type=CommitType.refactor,
+            scope='changelog',
+            subject='better model',
+            body='NamedTuple rocks !',
             footer=None
         )
         # WHEN
@@ -91,34 +91,34 @@ class TestCommit:
 class TestChangelog:
     def test_parse(self):
         # GIVEN
-        with open(data_file_path('big.log'), encoding='utf-8') as logfile:
+        with open(data_file_path('big.gitlog'), encoding='utf-8') as logfile:
             log = logfile.read()
-        expected_commit_without_scope = Commit(
-            commit_id='6f0c30e4d03f342280f74a57aa5d263bde4c869b',
-            author='Frederic DEMANY <frederic.demany@orange.com>',
-            date=DateUtil.str2date('2017-03-21 16:09:13 +0100'),
-            type=None,
-            scope=None,
-            subject="Merge branch 'develop' of ssh://forge.orange-labs.fr/mobilecare/CoreApps_Android into develop",
-            body=None,
+        expected_commit_with_scope = Commit(
+            commit_id='a6f79b56acbb9e58327ecf91feed611bb614927f',
+            author='Nicolas Gouzy <nicolas.gouzy@orange.com>',
+            date=DateUtil.str2date('2017-03-23 17:30:56 +0100'),
+            type=CommitType.refactor,
+            scope='changelog',
+            subject="better model",
+            body='NamedTuple rocks !',
             footer=None
         )
-        expected_commit_with_scope = Commit(
-            commit_id='00ce370f41b52329bb47b642373fbb0ba48a74d3',
-            author='Frederic DEMANY <frederic.demany@orange.com>',
-            date=DateUtil.str2date('2017-03-21 16:09:02 +0100'),
-            type=CommitType.feat,
-            scope='o2',
-            subject='OEMAND-412',
-            body='prepaid case',
+        expected_commit_without_scope = Commit(
+            commit_id='597ec5676235e18f5a607726603df944da5be7fe',
+            author='Nicolas Gouzy <nicolas.gouzy@orange.com>',
+            date=DateUtil.str2date('2017-03-22 15:28:45 +0100'),
+            type=None,
+            scope=None,
+            subject='Merge branch develop into master',
+            body=None,
             footer=None
         )
         # WHEN
         commits = Changelog.parse(log)
         # THEN
-        assert (len(commits) == 107)
-        assert commits[0] == expected_commit_without_scope
-        assert commits[1] == expected_commit_with_scope
+        assert (len(commits) == 35)
+        assert commits[0] == expected_commit_with_scope
+        assert commits[1] == expected_commit_without_scope
 
 
 # Tools

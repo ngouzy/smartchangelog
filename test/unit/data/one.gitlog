@@ -1,0 +1,7 @@
+commit a6f79b56acbb9e58327ecf91feed611bb614927f
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-23 17:30:56 +0100
+
+    refactor(changelog): better model
+
+    NamedTuple rocks !

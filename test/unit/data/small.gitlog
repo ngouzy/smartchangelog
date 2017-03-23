@@ -1,0 +1,49 @@
+commit a6f79b56acbb9e58327ecf91feed611bb614927f
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-23 17:30:56 +0100
+
+    refactor(changelog): better model
+
+    NamedTuple rocks !
+
+commit 597ec5676235e18f5a607726603df944da5be7fe
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-22 15:28:45 +0100
+
+    Merge branch develop into master
+
+commit 82e3d1519ca2dbd39c15796dd2c8e613e1155961
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-22 11:15:14 +0100
+
+    test(static): change log is now under mypy check
+
+commit d71b99d86402f196f3f1b9f0cd7020e9ba69bd85
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-22 11:14:18 +0100
+
+    feat(changelog): parsers rock
+
+commit 9b88c7c7c7b055a571cd1cfa26a8927623ce2c9f
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-22 11:13:14 +0100
+
+    test(equality): test equality of CommitMsg
+
+commit ea72e1939ec55afda9ce04e1b94708710da53253
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-22 11:10:52 +0100
+
+    refactor(commitmsg): use @classmethod instead of @staticmethod
+
+commit 706d3977e4496d9410e50a1c94b1bdab0614bea0
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-21 23:28:11 +0100
+
+    feat(changelog): wip
+
+commit 160f2521fb9006b1ddf5bfaae67f353d3aae3d5a
+Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
+Date:   2017-03-20 10:12:19 +0100
+
+    refactor(test): remove unnecessary mypy parameters
