@@ -1,10 +1,9 @@
-from changelog import Changelog, Commit, DateUtil
-from commitmsg import CommitMsg, CommitType
-
-from typing import List
-from datetime import datetime, timezone, timedelta
 import inspect
 import os
+from datetime import datetime, timezone, timedelta
+
+from changelog import Changelog, Commit, DateUtil
+from commitmsg import CommitType
 
 
 class TestDateUtil:
@@ -46,117 +45,83 @@ class TestDateUtil:
 class TestCommit:
     def test_parse(self):
         # GIVEN
-        with open(logfile_path('one.log'), encoding='utf-8') as logfile:
+        with open(data_file_path('one.log'), encoding='utf-8') as logfile:
             log = logfile.read()
         expected = Commit(
             commit_id='2d6b8b7d11cea43bab36da37afdca3c300f92333',
             author='Vincent Boesch <vincent.boesch@orange.com>',
             date=DateUtil.str2date('2017-03-21 14:45:48 +0100'),
-            message=CommitMsg(
-                msg_type=CommitType.feat,
-                scope='conso',
-                subject='OEM-372',
-                body='add field for nbAlerts'
-            )
+            type=CommitType.feat,
+            scope='conso',
+            subject='OEM-372',
+            body='add field for nbAlerts',
+            footer=None
         )
         # WHEN
-        commit = Commit.parse(log)
+        changelog_item = Commit.parse(log)
         # THEN
-        assert commit == expected
+        assert changelog_item == expected
 
-    def test_equality_with_same_commit(self):
+    def test_strip_lines(self):
         # GIVEN
-        c1 = Commit(
-            commit_id='2d6b8b7d11cea43bab36da37afdca3c300f92333',
-            author='Vincent Boesch <vincent.boesch@orange.com>',
-            date=DateUtil.str2date('2017-03-21 14:45:48 +0100'),
-            raw_message="feat(conso): OEM-372\nadd field for nbAlerts"
-        )
-        c2 = Commit(
-            commit_id='a2b6660b767113353b6203ef658074a1af73bab6',
-            author='Patrick Boursier <patrick.boursier@orange.com>',
-            date=DateUtil.str2date('2017-03-21 14:45:48 +0100'),
-            raw_message="refactor(account): resizeDrawable method"
-        )
-        # WHEN
-        # THEN
-        assert c1 != c2
+        string = """
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            Phasellus non erat imperdiet, pellentesque nibh et, porta velit.
 
-    def test_equality_with_other_commit(self):
-        # GIVEN
-        c1 = Commit(
-            commit_id='2d6b8b7d11cea43bab36da37afdca3c300f92333',
-            author='Vincent Boesch <vincent.boesch@orange.com>',
-            date=DateUtil.str2date('2017-03-21 14:45:48 +0100'),
-            raw_message="feat(conso): OEM-372\nadd field for nbAlerts"
-        )
-        c2 = Commit(
-            commit_id='2d6b8b7d11cea43bab36da37afdca3c300f92333',
-            author='Vincent Boesch <vincent.boesch@orange.com>',
-            date=DateUtil.str2date('2017-03-21 14:45:48 +0100'),
-            raw_message="feat(conso): OEM-372\nadd field for nbAlerts"
-        )
-        # WHEN
-        # THEN
-        assert c1 == c2
+                Fusce sit amet elit ac magna congue accumsan sed ut tellus.
+            Nullam at velit tincidunt, sodales mi quis, gravida metus.
 
-    def test_equality_with_other_class(self):
-        # GIVEN
-        c = Commit(
-            commit_id='2d6b8b7d11cea43bab36da37afdca3c300f92333',
-            author='Vincent Boesch <vincent.boesch@orange.com>',
-            date=DateUtil.str2date('2017-03-21 14:45:48 +0100'),
-            raw_message="feat(conso): OEM-372\nadd field for nbAlerts"
-        )
-        s = "a string"
+
+            Quisque pellentesque ipsum nec nunc vehicula tincidunt.
+        """
+        expected = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n" \
+                   "Phasellus non erat imperdiet, pellentesque nibh et, porta velit.\n" \
+                   "\n" \
+                   "Fusce sit amet elit ac magna congue accumsan sed ut tellus.\n" \
+                   "Nullam at velit tincidunt, sodales mi quis, gravida metus.\n" \
+                   "\n" \
+                   "\n" \
+                   "Quisque pellentesque ipsum nec nunc vehicula tincidunt."
         # WHEN
+        actual = Commit.strip_lines(string)
         # THEN
-        assert c != s
+        assert actual == expected
 
 
 class TestChangelog:
     def test_parse(self):
         # GIVEN
-        with open(logfile_path('big.log'), encoding='utf-8') as logfile:
+        with open(data_file_path('big.log'), encoding='utf-8') as logfile:
             log = logfile.read()
-        expected_commit_with_raw_message = Commit(
+        expected_commit_without_scope = Commit(
             commit_id='6f0c30e4d03f342280f74a57aa5d263bde4c869b',
             author='Frederic DEMANY <frederic.demany@orange.com>',
             date=DateUtil.str2date('2017-03-21 16:09:13 +0100'),
-            raw_message="Merge branch 'develop' of ssh://forge.orange-labs.fr/mobilecare/CoreApps_Android into develop"
+            type=None,
+            scope=None,
+            subject="Merge branch 'develop' of ssh://forge.orange-labs.fr/mobilecare/CoreApps_Android into develop",
+            body=None,
+            footer=None
         )
-        expected_commit_with_message = Commit(
+        expected_commit_with_scope = Commit(
             commit_id='00ce370f41b52329bb47b642373fbb0ba48a74d3',
             author='Frederic DEMANY <frederic.demany@orange.com>',
             date=DateUtil.str2date('2017-03-21 16:09:02 +0100'),
-            message=CommitMsg(
-                msg_type=CommitType.feat,
-                scope='o2',
-                subject='OEMAND-412',
-                body='prepaid case'
-            )
+            type=CommitType.feat,
+            scope='o2',
+            subject='OEMAND-412',
+            body='prepaid case',
+            footer=None
         )
         # WHEN
         commits = Changelog.parse(log)
         # THEN
         assert (len(commits) == 107)
-        assert commits[0] == expected_commit_with_raw_message
-        assert commits[1] == expected_commit_with_message
-
-    def test_pretty(self):
-        # GIVEN
-        with open(logfile_path('big.log'), encoding='utf-8') as logfile:
-            log = logfile.read()
-        changelog = Changelog.parse(log)
-        types = ['unknown'] + [str(msg_type) for msg_type in CommitType]
-        # WHEN
-        pretty_changelog = changelog.pretty()
-        # THEN
-        for msg_type in pretty_changelog.keys():
-            assert msg_type in types
+        assert commits[0] == expected_commit_without_scope
+        assert commits[1] == expected_commit_with_scope
 
 
 # Tools
 
-def logfile_path(logfilename: str) -> str:
-    return os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), 'data', logfilename)
+def data_file_path(filename: str) -> str:
+    return os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), 'data', filename)
