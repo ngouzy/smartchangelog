@@ -1,6 +1,8 @@
 import re
 from datetime import datetime
-from typing import List, Dict, NamedTuple
+from typing import List, Tuple, NamedTuple
+from itertools import groupby
+from collections import Iterable
 from io import StringIO
 
 from commitmsg import CommitMsg, CommitSyntaxError, CommitType
@@ -89,4 +91,31 @@ class Changelog(List[Commit]):
     def parse(cls, log: str) -> 'Changelog':
         raw_commits = re.findall('(commit [a-z0-9]{40}\n(?:.|\n)*?)(?=commit|$)', log)
         return Changelog([Commit.parse(rc) for rc in raw_commits])
+
+    def groupby(self, *criteria: Tuple[property]):
+        criteria_list: List[property] = list(criteria)
+        criterion = criteria_list.pop(0)
+        # Filter
+        categorized_changelog = Changelog([commit for commit in self if criterion.fget(commit) is not None])
+        uncategorized_commits = [commit for commit in self if criterion.fget(commit) is None]
+        # Sort
+        categorized_changelog.sort(key=criterion.fget)
+        # Arrange
+        result = self.groupby_to_list(groupby(categorized_changelog, criterion.fget))
+        if len(criteria_list) == 0:
+            return result
+        else:
+            for item in result:
+                cl = Changelog(item[1])
+                item[1] = cl.groupby(*criteria_list)
+            return result
+
+    @classmethod
+    def groupby_to_list(cls, iterable: Iterable):
+        return [[key, [i for i in group]] for key, group in iterable]
+
+
+
+
+
 

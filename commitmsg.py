@@ -26,6 +26,14 @@ class CommitType(Enum):
     test = 'adding missing tests, refactoring tests; no production code change'
     chore = 'updating gradle scripts, continuous integration scripts,  etc; no production code change'
 
+    def __lt__(self, other):
+        if isinstance(other, self.__class__):
+            return self.index() < other.index()
+        return NotImplemented
+
+    def index(self):
+        return [ct for ct in CommitType].index(self)
+
 
 class FirstLine(NamedTuple):
     type: CommitType

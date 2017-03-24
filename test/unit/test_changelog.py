@@ -114,11 +114,21 @@ class TestChangelog:
             footer=None
         )
         # WHEN
-        commits = Changelog.parse(log)
+        changelog = Changelog.parse(log)
         # THEN
-        assert (len(commits) == 35)
-        assert commits[0] == expected_commit_with_scope
-        assert commits[1] == expected_commit_without_scope
+        assert (len(changelog) == 35)
+        assert changelog[0] == expected_commit_with_scope
+        assert changelog[1] == expected_commit_without_scope
+
+    def test_groupby(self):
+        # GIVEN
+        with open(data_file_path('big.gitlog'), encoding='utf-8') as logfile:
+            log = logfile.read()
+        changelog = Changelog.parse(log)
+        # WHEN
+        result = changelog.groupby(Commit.type, Commit.scope)
+        # THEN
+        assert result
 
 
 # Tools
