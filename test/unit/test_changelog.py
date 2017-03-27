@@ -130,6 +130,16 @@ class TestChangelog:
         # THEN
         assert result
 
+    def x_test_oem(self):
+        # GIVEN
+        with open(data_file_path('oem.gitlog'), encoding='utf-8') as logfile:
+            log = logfile.read()
+        changelog = Changelog.parse(log)
+        # WHEN
+        pretty = changelog.pretty()
+        # THEN
+        assert pretty
+
 
 # Tools
 

@@ -93,6 +93,9 @@ class Changelog(List[Commit]):
         return Changelog([Commit.parse(rc) for rc in raw_commits])
 
     def groupby(self, *criteria: Tuple[property]):
+        if len(criteria) == 0:
+            self.sort(key=Commit.date.fget)
+            return self
         criteria_list: List[property] = list(criteria)
         criterion = criteria_list.pop(0)
         # Filter
@@ -102,17 +105,52 @@ class Changelog(List[Commit]):
         categorized_changelog.sort(key=criterion.fget)
         # Arrange
         result = self.groupby_to_list(groupby(categorized_changelog, criterion.fget))
-        if len(criteria_list) == 0:
-            return result
-        else:
-            for item in result:
-                cl = Changelog(item[1])
-                item[1] = cl.groupby(*criteria_list)
-            return result
+        for item in result:
+            cl = Changelog(item[1])
+            item[1] = cl.groupby(*criteria_list)
+        if len(uncategorized_commits) > 0:
+            result.append(["unknown", uncategorized_commits])
+        return result
 
     @classmethod
     def groupby_to_list(cls, iterable: Iterable):
         return [[key, [i for i in group]] for key, group in iterable]
+
+    def pretty(self):
+        with StringIO() as report:
+            for item in self.groupby(Commit.type, Commit.scope):
+                commit_type = item[0]
+                group = item[1]
+                if isinstance(commit_type, CommitType):
+                    print("# type: {type}".format(type=commit_type.name), file=report)
+                    print("", file=report)
+                    for subitem in group:
+                        scope = subitem[0]
+                        subgroup = subitem[1]
+                        print("## scope: {scope}".format(scope=scope), file=report)
+                        print("", file=report)
+                        for commit in subgroup:
+                            print("* subject: {subject}".format(subject=commit.subject or ''), file=report)
+                            print("    * body: {body}".format(body=commit.body or ''), file=report)
+                            print("    * footer: {footer}".format(footer=commit.footer or ''), file=report)
+                            print("    * date: {date}".format(date=DateUtil.date2str(commit.date)), file=report)
+                            print("    * author: {author}".format(author=commit.author), file=report)
+                        print("", file=report)
+                else:
+                    print("# type: {type}".format(type=commit_type), file=report)
+                    print("", file=report)
+                    for commit in group:
+                        print("* subject: {subject}".format(subject=commit.subject), file=report)
+                        print("    * body: {body}".format(body=commit.body or ''), file=report)
+                        print("    * date: {date}".format(date=DateUtil.date2str(commit.date)), file=report)
+                        print("    * author: {author}".format(author=commit.author), file=report)
+                print("", file=report)
+            return report.getvalue()
+
+
+
+
+
 
 
 
