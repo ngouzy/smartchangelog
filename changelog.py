@@ -21,7 +21,7 @@ class DateUtil:
 
 
 class _Commit(NamedTuple):
-    commit_id: str
+    id: str
     author: str
     date: datetime
     type: CommitType = None
@@ -41,16 +41,16 @@ class Commit(_Commit):
 
     @classmethod
     def parse(cls, commit: str) -> 'Commit':
-        m = re.match('commit (?P<commit_id>[a-z0-9]{40})(?:\n|.)+Author: (?P<author>.*)(?:\n|.)+'
+        m = re.match('commit (?P<id>[a-z0-9]{40})(?:\n|.)+Author: (?P<author>.*)(?:\n|.)+'
                      'Date: (?P<date>.*)(?P<message>(.|\n)*)',
                      commit)
         gd = m.groupdict()
         message = cls.parse_message(gd['message'])
-        commit_id = gd['commit_id']
+        commit_id = gd['id']
         author = gd['author']
         date = DateUtil.str2date(gd['date'].strip())
         return cls(
-            commit_id=commit_id,
+            id=commit_id,
             author=author,
             date=date,
             type=message.type,
@@ -122,19 +122,39 @@ class Node:
         else:
             return self.parent.depth_level() + 1
 
-    def pretty(self) -> str:
+    def __len__(self):
+        if not self.children:
+            return 1
+        nb_children = 0
+        for child in self.children:
+            nb_children += len(child)
+        return nb_children
+
+    def report(self) -> str:
         sio = StringIO()
         with sio:
             if self.children is None:
                 commit = self.value
                 print("* subject: {subject}".format(subject=commit.subject or ''), file=sio)
                 if commit.body:
-                    print("    * body: {body}".format(body=commit.body), file=sio)
+                    lines = commit.body.split('\n')
+                    if len(lines) == 1:
+                        print("    * body: {body}".format(body=commit.body), file=sio)
+                    else:
+                        print("    * body:", file=sio)
+                        for line in lines:
+                            print("        - {line}".format(line=line), file=sio)
                 if commit.footer:
-                    print("    * footer: {footer}".format(footer=commit.footer), file=sio)
+                    lines = commit.footer.split('\n')
+                    if len(lines) == 1:
+                        print("    * footer: {footer}".format(footer=commit.footer), file=sio)
+                    else:
+                        print("    * footer:", file=sio)
+                        for line in lines:
+                            print("        - {line}".format(line=line), file=sio)
                 print("    * date: {date}".format(date=DateUtil.date2str(commit.date)), file=sio)
-                if commit.author:
-                    print("    * author: {author}".format(author=commit.author), file=sio)
+                print("    * author: {author}".format(author=commit.author), file=sio)
+                print("    * commit: {id}".format(id=commit.id), file=sio)
             else:
                 for node in self.children:
                     if node.name:
@@ -147,7 +167,7 @@ class Node:
                             file=sio
                         )
                         print(file=sio)
-                    print(node.pretty().strip('\n'), file=sio)
+                    print(node.report().strip('\n'), file=sio)
                     print(file=sio)
             string = sio.getvalue()
             return string

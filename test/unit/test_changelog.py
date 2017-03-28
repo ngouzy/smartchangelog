@@ -45,10 +45,10 @@ class TestDateUtil:
 class TestCommit:
     def test_parse(self):
         # GIVEN
-        with open(data_file_path('one.gitlog'), encoding='utf-8') as logfile:
-            log = logfile.read()
+        with open(data_file_path('one.gitlog'), encoding='utf-8') as log_file:
+            log = log_file.read()
         expected = Commit(
-            commit_id='a6f79b56acbb9e58327ecf91feed611bb614927f',
+            id='a6f79b56acbb9e58327ecf91feed611bb614927f',
             author='Nicolas Gouzy <nicolas.gouzy@orange.com>',
             date=DateUtil.str2date('2017-03-23 17:30:56 +0100'),
             type=CommitType.refactor,
@@ -98,10 +98,10 @@ class TestCommit:
 class TestChangelog:
     def test_parse(self):
         # GIVEN
-        with open(data_file_path('big.gitlog'), encoding='utf-8') as logfile:
-            log = logfile.read()
+        with open(data_file_path('big.gitlog'), encoding='utf-8') as log_file:
+            log = log_file.read()
         expected_commit_with_scope = Commit(
-            commit_id='a6f79b56acbb9e58327ecf91feed611bb614927f',
+            id='a6f79b56acbb9e58327ecf91feed611bb614927f',
             author='Nicolas Gouzy <nicolas.gouzy@orange.com>',
             date=DateUtil.str2date('2017-03-23 17:30:56 +0100'),
             type=CommitType.refactor,
@@ -111,7 +111,7 @@ class TestChangelog:
             footer=None
         )
         expected_commit_without_scope = Commit(
-            commit_id='597ec5676235e18f5a607726603df944da5be7fe',
+            id='597ec5676235e18f5a607726603df944da5be7fe',
             author='Nicolas Gouzy <nicolas.gouzy@orange.com>',
             date=DateUtil.str2date('2017-03-22 15:28:45 +0100'),
             type=None,
@@ -129,25 +129,53 @@ class TestChangelog:
 
     def test_groupby(self):
         # GIVEN
-        with open(data_file_path('big.gitlog'), encoding='utf-8') as logfile:
-            log = logfile.read()
+        with open(data_file_path('big.gitlog'), encoding='utf-8') as log_file:
+            log = log_file.read()
         changelog = Changelog.parse(log)
         # WHEN
-        result = changelog.groupby(Commit.type, Commit.scope)
-        string = result.pretty()
+        node = changelog.groupby(Commit.type, Commit.scope)
         # THEN
-        assert result
-        assert string
+        assert len(node) == len(changelog)
 
-    def x_test_oem(self):
+
+class TestNode:
+    def test_len_with_empty_tree(self):
         # GIVEN
-        with open(data_file_path('oem.gitlog'), encoding='utf-8') as logfile:
-            log = logfile.read()
-        changelog = Changelog.parse(log)
+        tree = Node()
         # WHEN
-        pretty = changelog.pretty()
         # THEN
-        assert pretty
+        assert len(tree) == 1
+
+    def test_len_with_small_tree(self):
+        # GIVEN
+        children = tuple([Node(name=str(i)) for i in range(10)])
+        tree = Node(children=children)
+        # WHEN
+        actual = len(tree)
+        # THEN
+        assert actual == 10
+
+    def test_len_with_tree(self):
+        # GIVEN
+        children = tuple([Node(name=str(i), children=tuple([Node(), Node()])) for i in range(10)])
+        tree = Node(children=children)
+        # WHEN
+        actual = len(tree)
+        # THEN
+        assert actual == 20
+
+    def test_report_with_big_git_log(self):
+        # GIVEN
+        with open(data_file_path('big.gitlog'), encoding='utf-8') as log_file:
+            log = log_file.read()
+        changelog = Changelog.parse(log)
+        node = changelog.groupby(Commit.type, Commit.scope)
+        with open(data_file_path('big.md'), encoding='utf-8') as md_file:
+            expected = md_file.read()
+        # WHEN
+        report = node.report()
+        # THEN
+        assert report == expected
 
 
 # Tools

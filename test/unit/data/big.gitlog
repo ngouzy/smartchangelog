@@ -18,6 +18,12 @@ Date:   2017-03-22 11:15:14 +0100
 
     test(static): change log is now under mypy check
 
+    body 1
+    body 2
+    body 3
+
+    footer
+
 commit d71b99d86402f196f3f1b9f0cd7020e9ba69bd85
 Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
 Date:   2017-03-22 11:14:18 +0100
@@ -32,7 +38,8 @@ Date:   2017-03-22 11:13:14 +0100
 
     body
 
-    footer
+    footer 1
+    footer 2
 
 commit ea72e1939ec55afda9ce04e1b94708710da53253
 Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
