@@ -30,11 +30,20 @@ Date:   2017-03-22 11:13:14 +0100
 
     test(equality): test equality of CommitMsg
 
+    body
+
+    footer
+
 commit ea72e1939ec55afda9ce04e1b94708710da53253
 Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
 Date:   2017-03-22 11:10:52 +0100
 
-    refactor(commitmsg): use @classmethod instead of @staticmethod
+    refactor commitmsg
+
+    use @classmethod instead of @staticmethod
+    body2
+
+    footer
 
 commit 706d3977e4496d9410e50a1c94b1bdab0614bea0
 Author: Nicolas Gouzy <nicolas.gouzy@orange.com>

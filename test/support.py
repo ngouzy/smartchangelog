@@ -12,7 +12,7 @@ import commitmsg
 commitmsg_script_path = inspect.getfile(commitmsg)
 
 
-def git_command(*git_args: Tuple[str]) -> subprocess.CompletedProcess:
+def git_command(*git_args: str) -> subprocess.CompletedProcess:
     args = ['git'] + cast(List[str], list(git_args))
     completed_process = subprocess.run(args,
                                        stdout=subprocess.PIPE,

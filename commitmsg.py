@@ -34,6 +34,9 @@ class CommitType(Enum):
     def index(self):
         return [ct for ct in CommitType].index(self)
 
+    def __str__(self):
+        return self.name
+
 
 class FirstLine(NamedTuple):
     type: CommitType

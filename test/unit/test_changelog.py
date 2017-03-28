@@ -2,7 +2,7 @@ import inspect
 import os
 from datetime import datetime, timezone, timedelta
 
-from changelog import Changelog, Commit, DateUtil
+from changelog import Changelog, Commit, DateUtil, Node
 from commitmsg import CommitType
 
 
@@ -54,8 +54,7 @@ class TestCommit:
             type=CommitType.refactor,
             scope='changelog',
             subject='better model',
-            body='NamedTuple rocks !',
-            footer=None
+            body='NamedTuple rocks !'
         )
         # WHEN
         changelog_item = Commit.parse(log)
@@ -86,6 +85,14 @@ class TestCommit:
         actual = Commit.strip_lines(string)
         # THEN
         assert actual == expected
+
+    def test_property_name(self):
+        # GIVEN
+        prop = Commit.author
+        # WHEN
+        property_name = Commit.property_name(prop)
+        # THEN
+        assert property_name == 'author'
 
 
 class TestChangelog:
@@ -127,8 +134,10 @@ class TestChangelog:
         changelog = Changelog.parse(log)
         # WHEN
         result = changelog.groupby(Commit.type, Commit.scope)
+        string = result.pretty()
         # THEN
         assert result
+        assert string
 
     def x_test_oem(self):
         # GIVEN

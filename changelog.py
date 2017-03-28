@@ -1,6 +1,6 @@
 import re
 from datetime import datetime
-from typing import List, Tuple, NamedTuple
+from typing import List, Tuple, NamedTuple, Callable, Any, cast
 from itertools import groupby
 from collections import Iterable
 from io import StringIO
@@ -24,20 +24,20 @@ class _Commit(NamedTuple):
     commit_id: str
     author: str
     date: datetime
-    type: CommitType
-    scope: str
-    subject: str
-    body: str
-    footer: str
+    type: CommitType = None
+    scope: str = None
+    subject: str = None
+    body: str = None
+    footer: str = None
 
 
 class Commit(_Commit):
     class Message(NamedTuple):
-        type: CommitType
-        scope: str
-        subject: str
-        body: str
-        footer: str
+        type: CommitType = None
+        scope: str = None
+        subject: str = None
+        body: str = None
+        footer: str = None
 
     @classmethod
     def parse(cls, commit: str) -> 'Commit':
@@ -85,69 +85,121 @@ class Commit(_Commit):
                 footer=None
             )
 
+    @classmethod
+    def property_name(cls, prop: property) -> str:
+        i = int(x=prop.__doc__.split(' ')[-1])
+        return tuple(cls._fields)[i]
+
+
+class Node:
+    def __init__(self, name: str = None, criterion: property = None, children: Tuple['Node'] = None,
+                 value: Commit = None) -> None:
+        self._parent: 'Node' = None
+        self.name = name
+        self.criterion = criterion
+        self._children: Tuple['Node'] = None
+        self.children = children
+        self.value = value
+
+    @property
+    def parent(self) -> 'Node':
+        return self._parent
+
+    @property
+    def children(self) -> Tuple['Node']:
+        return self._children
+
+    @children.setter
+    def children(self, children: Tuple['Node']) -> None:
+        if children is not None:
+            for node in children:
+                node._parent = self
+        self._children = children
+
+    def depth_level(self) -> int:
+        if self.parent is None:
+            return 0
+        else:
+            return self.parent.depth_level() + 1
+
+    def pretty(self) -> str:
+        sio = StringIO()
+        with sio:
+            if self.children is None:
+                commit = self.value
+                print("* subject: {subject}".format(subject=commit.subject or ''), file=sio)
+                if commit.body:
+                    print("    * body: {body}".format(body=commit.body), file=sio)
+                if commit.footer:
+                    print("    * footer: {footer}".format(footer=commit.footer), file=sio)
+                print("    * date: {date}".format(date=DateUtil.date2str(commit.date)), file=sio)
+                if commit.author:
+                    print("    * author: {author}".format(author=commit.author), file=sio)
+            else:
+                for node in self.children:
+                    if node.name:
+                        print(
+                            "{header} {criterion_name}: {name}".format(
+                                header="#" * (self.depth_level() + 1),
+                                criterion_name=Commit.property_name(node.criterion),
+                                name=node.name
+                            ),
+                            file=sio
+                        )
+                        print(file=sio)
+                    print(node.pretty().strip('\n'), file=sio)
+                    print(file=sio)
+            string = sio.getvalue()
+            return string
+
 
 class Changelog(List[Commit]):
     @classmethod
     def parse(cls, log: str) -> 'Changelog':
-        raw_commits = re.findall('(commit [a-z0-9]{40}\n(?:.|\n)*?)(?=commit|$)', log)
+        raw_commits = re.findall('(commit [a-z0-9]{40}\n(?:.|\n)*?)(?=commit [a-z0-9]{40}|$)', log)
         return Changelog([Commit.parse(rc) for rc in raw_commits])
 
-    def groupby(self, *criteria: Tuple[property]):
+    def groupby(self, *criteria: property) -> Node:
         if len(criteria) == 0:
-            self.sort(key=Commit.date.fget)
-            return self
-        criteria_list: List[property] = list(criteria)
+            # Sort
+            date_prop = cast(property, Commit.date)
+            date_getter = cast(Callable[[Commit], Any], date_prop.fget)
+            self.sort(key=date_getter)
+            return self.node()
+
+        criteria_list = list(criteria)
         criterion = criteria_list.pop(0)
+        criterion_getter = cast(Callable[[Commit], Any], criterion.fget)
+
         # Filter
-        categorized_changelog = Changelog([commit for commit in self if criterion.fget(commit) is not None])
-        uncategorized_commits = [commit for commit in self if criterion.fget(commit) is None]
+        # noinspection PyTypeChecker
+        categorized_changelog = Changelog([commit for commit in self if criterion_getter(commit) is not None])
+        # noinspection PyTypeChecker
+        uncategorized_commits = Changelog([commit for commit in self if criterion_getter(commit) is None])
+
         # Sort
-        categorized_changelog.sort(key=criterion.fget)
+        categorized_changelog.sort(key=criterion_getter)
+
         # Arrange
-        result = self.groupby_to_list(groupby(categorized_changelog, criterion.fget))
-        for item in result:
-            cl = Changelog(item[1])
-            item[1] = cl.groupby(*criteria_list)
+        raw_result = self.groupby_to_list(groupby(iterable=categorized_changelog, key=criterion_getter))
+        children_list: List[Node] = []
+        for key, group in raw_result:
+            cl = Changelog(group)
+            children_list.append(Node(name=str(key), criterion=criterion, children=cl.groupby(*criteria_list).children))
         if len(uncategorized_commits) > 0:
-            result.append(["unknown", uncategorized_commits])
-        return result
+            children_list.append(uncategorized_commits.node(name="unknown", criterion=criterion))
+        children = cast(Tuple[Node], tuple(children_list))
+
+        return Node(children=children)
+
+    def node(self, name: str=None, criterion: property=None) -> Node:
+        # noinspection PyTypeChecker
+        children = cast(Tuple[Node], tuple(Node(value=commit) for commit in self))
+        return Node(name=name, criterion=criterion, children=children)
 
     @classmethod
     def groupby_to_list(cls, iterable: Iterable):
         return [[key, [i for i in group]] for key, group in iterable]
-
-    def pretty(self):
-        with StringIO() as report:
-            for item in self.groupby(Commit.type, Commit.scope):
-                commit_type = item[0]
-                group = item[1]
-                if isinstance(commit_type, CommitType):
-                    print("# type: {type}".format(type=commit_type.name), file=report)
-                    print("", file=report)
-                    for subitem in group:
-                        scope = subitem[0]
-                        subgroup = subitem[1]
-                        print("## scope: {scope}".format(scope=scope), file=report)
-                        print("", file=report)
-                        for commit in subgroup:
-                            print("* subject: {subject}".format(subject=commit.subject or ''), file=report)
-                            print("    * body: {body}".format(body=commit.body or ''), file=report)
-                            print("    * footer: {footer}".format(footer=commit.footer or ''), file=report)
-                            print("    * date: {date}".format(date=DateUtil.date2str(commit.date)), file=report)
-                            print("    * author: {author}".format(author=commit.author), file=report)
-                        print("", file=report)
-                else:
-                    print("# type: {type}".format(type=commit_type), file=report)
-                    print("", file=report)
-                    for commit in group:
-                        print("* subject: {subject}".format(subject=commit.subject), file=report)
-                        print("    * body: {body}".format(body=commit.body or ''), file=report)
-                        print("    * date: {date}".format(date=DateUtil.date2str(commit.date)), file=report)
-                        print("    * author: {author}".format(author=commit.author), file=report)
-                print("", file=report)
-            return report.getvalue()
-
-
 
 
 

@@ -210,3 +210,30 @@ class TestEquality:
         # THEN
         assert cm != s
 
+
+class TestCommitType:
+    def test_str(self):
+        # GIVEN
+        ct = CommitType.feat
+        # WHEN
+        string = str(ct)
+        # THEN
+        assert string == 'feat'
+
+    def test_lt_with_commit_type(self):
+        # GIVEN
+        ct1 = CommitType.feat
+        ct2 = CommitType.refactor
+        # WHEN
+        # THEN
+        assert ct1 < ct2
+
+    def test_lt_with_other_class(self):
+        # GIVEN
+        ct = CommitType.feat
+        s = "a string"
+        # WHEN
+        # THEN
+        with pytest.raises(TypeError):
+            assert ct < s
+
