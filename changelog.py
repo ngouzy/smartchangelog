@@ -1,6 +1,6 @@
 import re
 from datetime import datetime
-from typing import List, Tuple, NamedTuple, Callable, Any, cast
+from typing import List, Tuple, NamedTuple, Callable, Any, IO, cast
 from itertools import groupby
 from collections import Iterable
 from io import StringIO
@@ -130,43 +130,46 @@ class Node:
             nb_children += len(child)
         return nb_children
 
+    @classmethod
+    def print_multilines(cls, name: str, value: str, file: IO):
+        if value:
+            lines = value.split('\n')
+            if len(lines) == 1:
+                print("    * {name}: {value}".format(name=name, value=value), file=file)
+            else:
+                print("    * {name}:".format(name=name), file=file)
+                for line in lines:
+                    print("        - {line}".format(line=line), file=file)
+
+    @classmethod
+    def print_leaf(cls, commit: Commit, file: IO) -> None:
+        print("* subject: {subject}".format(subject=commit.subject or ''), file=file)
+        cls.print_multilines(name='body', value=commit.body, file=file)
+        cls.print_multilines(name='footer', value=commit.footer, file=file)
+        print("    * date: {date}".format(date=DateUtil.date2str(commit.date)), file=file)
+        print("    * author: {author}".format(author=commit.author), file=file)
+        print("    * commit: {id}".format(id=commit.id), file=file)
+
+    def print_header(self, node: 'Node', file: IO):
+        print(
+            "{header} {criterion_name}: {name}".format(
+                header="#" * (self.depth_level() + 1),
+                criterion_name=Commit.property_name(node.criterion),
+                name=node.name
+            ),
+            file=file
+        )
+        print(file=file)
+
     def report(self) -> str:
         sio = StringIO()
         with sio:
             if self.children is None:
-                commit = self.value
-                print("* subject: {subject}".format(subject=commit.subject or ''), file=sio)
-                if commit.body:
-                    lines = commit.body.split('\n')
-                    if len(lines) == 1:
-                        print("    * body: {body}".format(body=commit.body), file=sio)
-                    else:
-                        print("    * body:", file=sio)
-                        for line in lines:
-                            print("        - {line}".format(line=line), file=sio)
-                if commit.footer:
-                    lines = commit.footer.split('\n')
-                    if len(lines) == 1:
-                        print("    * footer: {footer}".format(footer=commit.footer), file=sio)
-                    else:
-                        print("    * footer:", file=sio)
-                        for line in lines:
-                            print("        - {line}".format(line=line), file=sio)
-                print("    * date: {date}".format(date=DateUtil.date2str(commit.date)), file=sio)
-                print("    * author: {author}".format(author=commit.author), file=sio)
-                print("    * commit: {id}".format(id=commit.id), file=sio)
+                self.print_leaf(commit=self.value, file=sio)
             else:
                 for node in self.children:
                     if node.name:
-                        print(
-                            "{header} {criterion_name}: {name}".format(
-                                header="#" * (self.depth_level() + 1),
-                                criterion_name=Commit.property_name(node.criterion),
-                                name=node.name
-                            ),
-                            file=sio
-                        )
-                        print(file=sio)
+                        self.print_header(node=node, file=sio)
                     print(node.report().strip('\n'), file=sio)
                     print(file=sio)
             string = sio.getvalue()
