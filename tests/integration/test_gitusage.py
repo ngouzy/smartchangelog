@@ -4,7 +4,7 @@ import tempfile
 
 import pytest
 
-from test.support import commitmsg_script_path, git_command
+from tests.support import commitmsg_script_path, git_command
 
 
 @pytest.fixture(scope='function')

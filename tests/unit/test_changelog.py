@@ -2,8 +2,9 @@ import inspect
 import os
 from datetime import datetime, timezone, timedelta
 
-from changelog import Changelog, Commit, DateUtil, Node
-from commitmsg import CommitType
+from smartchangelog.commit import CommitType
+
+from smartchangelog.changelog import Changelog, Commit, DateUtil, Node
 
 
 class TestDateUtil:

@@ -1,6 +1,6 @@
 import pytest
 
-from commitmsg import CommitMsg, CommitSyntaxError, CommitType
+from smartchangelog.commit import CommitMsg, CommitSyntaxError, CommitType
 
 
 class TestParseFirstLine:

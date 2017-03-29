@@ -1,11 +1,12 @@
 import re
-from datetime import datetime
-from typing import List, Tuple, NamedTuple, Callable, Any, IO, cast
-from itertools import groupby
 from collections import Iterable
+from datetime import datetime
 from io import StringIO
+from itertools import groupby
 
-from commitmsg import CommitMsg, CommitSyntaxError, CommitType
+from typing import List, Tuple, NamedTuple, Callable, Any, IO, cast
+
+from smartchangelog.commit import CommitMsg, CommitSyntaxError, CommitType
 
 
 class DateUtil:

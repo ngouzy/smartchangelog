@@ -1,13 +1,13 @@
 import inspect
 
+from smartchangelog import commit
 from mypy import api
 
-import commitmsg
-import changelog
+from smartchangelog import changelog
 
 
 def test_static_type_check_with_mypy():
-    commitmsg_file = inspect.getfile(commitmsg)
+    commitmsg_file = inspect.getfile(commit)
     changelog_file = inspect.getfile(changelog)
     params = ['--ignore-missing-imports', commitmsg_file, changelog_file]
     result = api.run(params)

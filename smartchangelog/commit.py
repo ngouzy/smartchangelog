@@ -1,13 +1,7 @@
-#!/usr/bin/env python3
-"""
-Git commit hook:
- .git/hooks/commit-msg
-"""
-
-import argparse
-import re
 import inspect
+import re
 from enum import Enum
+
 from typing import NamedTuple
 
 
@@ -156,28 +150,8 @@ class CommitMsg:
 
     @classmethod
     def help(cls) -> str:
-        return inspect.getdoc(cls).format(allowed_types=CommitMsg.format_allowed_types(),
-                                          firstline_max_length=CommitMsg.FIRSTLINE_MAX_LENGTH,
-                                          bodyline_max_length=CommitMsg.BODY_MAX_LENGTH,
-                                          footerline_max_length=CommitMsg.FOOTER_MAX_LENGTH)
+        return inspect.getdoc(cls).format(allowed_types=cls.format_allowed_types(),
+                                          firstline_max_length=cls.FIRSTLINE_MAX_LENGTH,
+                                          bodyline_max_length=cls.BODY_MAX_LENGTH,
+                                          footerline_max_length=cls.FOOTER_MAX_LENGTH)
 
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Git commit message checker",
-                                     formatter_class=argparse.RawDescriptionHelpFormatter,
-                                     epilog=CommitMsg.help())
-    parser.add_argument("msg", help="the commit message to check")
-    args = parser.parse_args()
-    msg = args.msg
-    if "COMMIT_EDITMSG" in msg:
-        with open(args.msg) as msg_file:
-            msg = msg_file.read()
-    try:
-        CommitMsg.parse(msg)
-    except CommitSyntaxError as e:
-        parser.error("{error}\n\n{help}".format(error=e, help=CommitMsg.help()))
-    exit(0)
-
-
-if __name__ == "__main__":
-    main()

@@ -1,12 +1,13 @@
 import inspect
+import os
 import subprocess
 import sys
-import os
 from contextlib import contextmanager
-from typing import List, Iterator, TextIO, cast
 from io import StringIO
 
-import commitmsg
+from typing import List, Iterator, TextIO, cast
+
+from smartchangelog.scripts import commitmsg
 
 """Path of the file containing commitmsg module"""
 commitmsg_script_path = inspect.getfile(commitmsg)
