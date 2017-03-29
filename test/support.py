@@ -3,7 +3,7 @@ import subprocess
 import sys
 import os
 from contextlib import contextmanager
-from typing import List, Tuple, Iterator, TextIO, cast
+from typing import List, Iterator, TextIO, cast
 from io import StringIO
 
 import commitmsg
