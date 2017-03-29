@@ -4,7 +4,7 @@ import tempfile
 
 import pytest
 
-from tests.support import commitmsg_script_path, git_command
+from tests.support import git_command
 
 
 @pytest.fixture(scope='function')
@@ -21,6 +21,7 @@ def temp_dir():
     git_command('config', 'user.email', 'nicolas.gouzy@gmail.com')
 
     git_hook_commit_msg_path = os.path.join(temporary_directory, ".git", "hooks", "commit-msg")
+    commitmsg_script_path = shutil.which("commit-msg")
     shutil.copy(commitmsg_script_path, git_hook_commit_msg_path)
     assert os.path.isfile(git_hook_commit_msg_path)
 
@@ -39,6 +40,7 @@ def test_git_commit_with_right_msg():
     # WHEN
     git_command('commit', '-m', 'feat(ui): sample')
     # THEN
+    pass
 
 
 @pytest.mark.usefixtures("temp_dir")
