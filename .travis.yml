@@ -7,4 +7,4 @@ install:
   - pip install -r test-requirements.txt
 
 script:
-  - pytest --cov-report term-missing --cov=commitmsg --cov=changelog
+  - pytest --cov-report term-missing --cov=smartchangelog
