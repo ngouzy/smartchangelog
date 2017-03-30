@@ -1,84 +1,12 @@
 import re
 from collections import Iterable
-from datetime import datetime
 from io import StringIO
 from itertools import groupby
 
-from typing import List, Tuple, NamedTuple, Callable, Any, IO, cast
+from typing import List, Tuple, Callable, Any, IO, cast
 
-from smartchangelog.commit import CommitMsg, CommitSyntaxError, CommitType
 from smartchangelog import datetools
-
-
-class _Commit(NamedTuple):
-    id: str
-    author: str
-    date: datetime
-    type: CommitType = None
-    scope: str = None
-    subject: str = None
-    body: str = None
-    footer: str = None
-
-
-class Commit(_Commit):
-    class Message(NamedTuple):
-        type: CommitType = None
-        scope: str = None
-        subject: str = None
-        body: str = None
-        footer: str = None
-
-    @classmethod
-    def parse(cls, commit: str) -> 'Commit':
-        m = re.match('commit (?P<id>[a-z0-9]{40})(?:\n|.)+Author: (?P<author>.*)(?:\n|.)+'
-                     'Date: (?P<date>.*)(?P<message>(.|\n)*)',
-                     commit)
-        gd = m.groupdict()
-        message = cls.parse_message(gd['message'])
-        commit_id = gd['id']
-        author = gd['author']
-        date = datetools.str2date(gd['date'].strip())
-        return cls(
-            id=commit_id,
-            author=author,
-            date=date,
-            type=message.type,
-            scope=message.scope,
-            subject=message.subject,
-            body=message.body,
-            footer=message.footer
-        )
-
-    @classmethod
-    def strip_lines(cls, string) -> str:
-        return "\n".join(line.strip() for line in string.strip(' \n').split('\n'))
-
-    @classmethod
-    def parse_message(cls, message: str) -> Message:
-        message = cls.strip_lines(message)
-        try:
-            cm = CommitMsg.parse(message)
-            return cls.Message(**cm.__dict__)
-        except CommitSyntaxError:
-            message = re.sub("\n+", "\n", message)
-            lines = message.split('\n', maxsplit=1)
-            subject = lines[0] or None
-            body = None
-            if len(lines) > 1:
-                body = lines[1] or None
-            return cls.Message(
-                type=None,
-                scope=None,
-                subject=subject,
-                body=body,
-                footer=None
-            )
-
-    @classmethod
-    def property_name(cls, prop: property) -> str:
-        i = int(x=prop.__doc__.split(' ')[-1])
-        return tuple(cls._fields)[i]
+from smartchangelog.commit import Commit
 
 
 class Node:

@@ -7,10 +7,10 @@ from io import StringIO
 
 from typing import List, Iterator, TextIO, cast
 
-from smartchangelog.scripts import commitmsg
+from smartchangelog.scripts import commitmsg_script
 
 """Path of the file containing commitmsg module"""
-commitmsg_script_path = inspect.getfile(commitmsg)
+commitmsg_script_path = inspect.getfile(commitmsg_script)
 
 
 def git_command(*git_args: str) -> subprocess.CompletedProcess:

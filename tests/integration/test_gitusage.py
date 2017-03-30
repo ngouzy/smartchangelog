@@ -10,9 +10,6 @@ from smartchangelog.tools import git_command
 @pytest.fixture(scope='function')
 def temp_dir():
     temporary_directory = tempfile.mkdtemp()
-    sample_file_path = os.path.join(temporary_directory, "sample_file.txt")
-    with open(sample_file_path, mode="w") as sample_file:
-        sample_file.write("sample content")
     old_cwd = os.getcwd()
     os.chdir(temporary_directory)
 
@@ -21,6 +18,10 @@ def temp_dir():
     git_command('config', 'user.email', 'nicolas.gouzy@gmail.com')
 
     githook.install()
+
+    sample_file_path = os.path.join(temporary_directory, "sample_file.txt")
+    with open(sample_file_path, mode="w") as sample_file:
+        sample_file.write("sample content")
 
     git_command('add', '.')
 

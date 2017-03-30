@@ -6,7 +6,7 @@ Git commit hook:
 
 import argparse
 
-from smartchangelog.commit import CommitMsg, CommitSyntaxError
+from smartchangelog.commitmsg import CommitMsg, CommitSyntaxError
 from smartchangelog import __version__
 from smartchangelog.githook import install, uninstall
 

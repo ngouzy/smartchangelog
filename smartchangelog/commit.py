@@ -1,157 +1,78 @@
-import inspect
 import re
-from enum import Enum
+from datetime import datetime
 
 from typing import NamedTuple
 
-
-class CommitSyntaxError(Exception):
-    """
-    Invalid commit syntax error
-    """
+from smartchangelog import datetools
+from smartchangelog.commitmsg import CommitType, CommitMsg, CommitSyntaxError
 
 
-class CommitType(Enum):
-    feat = 'new feature for the user, not a new feature for build script'
-    fix = 'bug fix for the user, not a fix to a build script'
-    docs = 'changes to the documentation'
-    style = 'formatting, missing semi colons, etc; no production code change'
-    refactor = 'refactoring production code, eg.renaming a variable'
-    test = 'adding missing tests, refactoring tests; no production code change'
-    chore = 'updating gradle scripts, continuous integration scripts,  etc; no production code change'
-
-    def __lt__(self, other):
-        if isinstance(other, self.__class__):
-            return self.index() < other.index()
-        return NotImplemented
-
-    def index(self):
-        return [ct for ct in CommitType].index(self)
-
-    def __str__(self):
-        return self.name
+class _Commit(NamedTuple):
+    id: str
+    author: str
+    date: datetime
+    type: CommitType = None
+    scope: str = None
+    subject: str = None
+    body: str = None
+    footer: str = None
 
 
-class FirstLine(NamedTuple):
-    type: CommitType
-    scope: str
-    subject: str
-
-
-class CommitMsg:
-    """
-    Your commit message have to follow this format:
-    <type>(<scope>): <subject>
-
-    <body>
-
-    <footer>
-    Where :
-    Message first line (type, scope and subject)
-        The first line cannot be longer than {firstline_max_length} characters.
-        The type and scope should always be lowercase as shown
-        below.
-        Allowed <type> values: {allowed_types}
-        Example <scope> values:
-            * ui
-            * business
-            * model
-            * widget
-            * config
-            etc.
-        The <scope> can be empty (e.g. if the change is a global or difficult
-        to assign to a single component), in which case the parentheses are
-        omitted.
-
-    Message body (optional)
-        If there is a body, it must have a blank line between the first line and
-        the body.
-        The body cannot be longer than {bodyline_max_length} characters.
-        uses the imperative, present tense: "change" not "changed" nor
-        "changes"
-        includes motivation for the change and contrasts with previous behavior
-
-    Message footer
-        Referencing issues or user stories (Jira references)
-        If there is a footer, it must have a body and it must have a blank line between the body and
-        the footer.
-        The footer cannot be longer than {footerline_max_length} characters.
-    """
-    FIRSTLINE_PATTERN = re.compile('^([a-z]+)(?:\(([^\n\t]+)\))?: (.+)$')
-    FIRSTLINE_MAX_LENGTH = 70
-    BODY_MAX_LENGTH = 80
-    FOOTER_MAX_LENGTH = 80
-
-    def __init__(self, msg_type: CommitType, scope: str, subject: str, body: str = None, footer: str = None) -> None:
-        self.type = msg_type
-        self.scope = scope
-        self.subject = subject
-        self.body = body
-        self.footer = footer
-
-    def __eq__(self, other) -> bool:
-        if isinstance(other, self.__class__):
-            return self.__dict__ == other.__dict__
-        return NotImplemented
+class Commit(_Commit):
+    class Message(NamedTuple):
+        type: CommitType = None
+        scope: str = None
+        subject: str = None
+        body: str = None
+        footer: str = None
 
     @classmethod
-    def parse(cls, msg: str) -> 'CommitMsg':
-        msg_parts = msg.split("\n\n")
-        firstline = cls.parse_firstline(msg_parts[0])
-        if len(msg_parts) > 1:
-            body = msg_parts[1]
-            cls.parse_body(body)
-        else:
-            body = None
-        if len(msg_parts) > 2:
-            footer = msg_parts[2]
-            cls.parse_footer(footer)
-        else:
-            footer = None
-        return cls(firstline.type, firstline.scope, firstline.subject, body, footer)
+    def parse(cls, commit: str) -> 'Commit':
+        m = re.match('commit (?P<id>[a-z0-9]{40})(?:\n|.)+Author: (?P<author>.*)(?:\n|.)+'
+                     'Date: (?P<date>.*)(?P<message>(.|\n)*)',
+                     commit)
+        gd = m.groupdict()
+        message = cls.parse_message(gd['message'])
+        commit_id = gd['id']
+        author = gd['author']
+        date = datetools.str2date(gd['date'].strip())
+        return cls(
+            id=commit_id,
+            author=author,
+            date=date,
+            type=message.type,
+            scope=message.scope,
+            subject=message.subject,
+            body=message.body,
+            footer=message.footer
+        )
 
     @classmethod
-    def parse_firstline(cls, firstline: str) -> FirstLine:
-        if len(firstline) > cls.FIRSTLINE_MAX_LENGTH:
-            raise CommitSyntaxError("First line can not be greater than {length} characters".format(
-                length=cls.FIRSTLINE_MAX_LENGTH))
-        result = cls.FIRSTLINE_PATTERN.search(firstline)
-        if "\n" in firstline.strip():
-            raise CommitSyntaxError("Two blank lines have to separate the first line and body part")
-        if result is None:
-            raise CommitSyntaxError("{firstline} doesn't follow the first line commit message pattern: {pattern}"
-                                    .format(firstline=firstline, pattern=cls.FIRSTLINE_PATTERN.pattern))
-        commit_type_str, scope, subject = result.groups()
+    def strip_lines(cls, string) -> str:
+        return "\n".join(line.strip() for line in string.strip(' \n').split('\n'))
+
+    @classmethod
+    def parse_message(cls, message: str) -> Message:
+        message = cls.strip_lines(message)
         try:
-            commit_type = CommitType[commit_type_str]
-        except KeyError:
-            raise CommitSyntaxError("{commit_type} is not an available commit type".format(commit_type=commit_type_str))
-        return FirstLine(type=commit_type, scope=scope, subject=subject)
+            cm = CommitMsg.parse(message)
+            return cls.Message(**cm.__dict__)
+        except CommitSyntaxError:
+            message = re.sub("\n+", "\n", message)
+            lines = message.split('\n', maxsplit=1)
+            subject = lines[0] or None
+            body = None
+            if len(lines) > 1:
+                body = lines[1] or None
+            return cls.Message(
+                type=None,
+                scope=None,
+                subject=subject,
+                body=body,
+                footer=None
+            )
 
     @classmethod
-    def parse_body(cls, body: str) -> str:
-        for line in body.split('\n'):
-            if len(line) > cls.BODY_MAX_LENGTH:
-                raise CommitSyntaxError("Body line can not be greater than {length} characters".format(
-                    length=cls.BODY_MAX_LENGTH))
-        return body
-
-    @classmethod
-    def parse_footer(cls, footer: str) -> str:
-        for line in footer.split('\n'):
-            if len(line) > cls.FOOTER_MAX_LENGTH:
-                raise CommitSyntaxError("Footer line can not be greater than {length} characters".format(
-                    length=cls.FOOTER_MAX_LENGTH))
-        return footer
-
-    @classmethod
-    def format_allowed_types(cls) -> str:
-        return "\n" + "\n".join("\t* {name}: {doc}".format(name=ct.name, doc=ct.value) for ct in CommitType)
-
-    @classmethod
-    def help(cls) -> str:
-        return inspect.getdoc(cls).format(allowed_types=cls.format_allowed_types(),
-                                          firstline_max_length=cls.FIRSTLINE_MAX_LENGTH,
-                                          bodyline_max_length=cls.BODY_MAX_LENGTH,
-                                          footerline_max_length=cls.FOOTER_MAX_LENGTH)
-
+    def property_name(cls, prop: property) -> str:
+        i = int(prop.__doc__.split(' ')[-1])
+        return tuple(cls._fields)[i]
