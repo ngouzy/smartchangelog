@@ -35,6 +35,7 @@ def temp_dir():
     os.chdir(old_cwd)
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures("temp_dir")
 def test_git_commit_with_right_msg():
     # GIVEN
@@ -44,6 +45,7 @@ def test_git_commit_with_right_msg():
     pass
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures("temp_dir")
 def test_git_commit_with_wrong_msg():
     with pytest.raises(AssertionError):
