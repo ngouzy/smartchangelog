@@ -7,18 +7,7 @@ from itertools import groupby
 from typing import List, Tuple, NamedTuple, Callable, Any, IO, cast
 
 from smartchangelog.commit import CommitMsg, CommitSyntaxError, CommitType
-
-
-class DateUtil:
-    date_format = "%Y-%m-%d %H:%M:%S %z"
-
-    @classmethod
-    def str2date(cls, string: str) -> datetime:
-        return datetime.strptime(string, cls.date_format)
-
-    @classmethod
-    def date2str(cls, dt: datetime) -> str:
-        return dt.strftime(cls.date_format)
+from smartchangelog import datetools
 
 
 class _Commit(NamedTuple):
@@ -49,7 +38,7 @@ class Commit(_Commit):
         message = cls.parse_message(gd['message'])
         commit_id = gd['id']
         author = gd['author']
-        date = DateUtil.str2date(gd['date'].strip())
+        date = datetools.str2date(gd['date'].strip())
         return cls(
             id=commit_id,
             author=author,
@@ -147,7 +136,7 @@ class Node:
         print("* subject: {subject}".format(subject=commit.subject or ''), file=file)
         cls.print_multilines(name='body', value=commit.body, file=file)
         cls.print_multilines(name='footer', value=commit.footer, file=file)
-        print("    * date: {date}".format(date=DateUtil.date2str(commit.date)), file=file)
+        print("    * date: {date}".format(date=datetools.date2str(commit.date)), file=file)
         print("    * author: {author}".format(author=commit.author), file=file)
         print("    * commit: {id}".format(id=commit.id), file=file)
 

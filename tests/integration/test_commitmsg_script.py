@@ -1,7 +1,7 @@
 import pytest
 
 import smartchangelog.scripts.commitmsg
-from tests.support import set_args, set_commit_editmsg, commitmsg_script_path
+from smartchangelog.tools import set_args, set_commit_editmsg, commitmsg_script_path
 
 
 def test_help_arg():

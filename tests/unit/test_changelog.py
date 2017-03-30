@@ -1,46 +1,9 @@
 import inspect
 import os
-from datetime import datetime, timezone, timedelta
 
+from smartchangelog.changelog import Changelog, Commit, Node
 from smartchangelog.commit import CommitType
-
-from smartchangelog.changelog import Changelog, Commit, DateUtil, Node
-
-
-class TestDateUtil:
-    def test_str2date(self):
-        # GIVEN
-        expected = datetime(
-            year=2017,
-            month=3,
-            day=21,
-            hour=16,
-            minute=9,
-            second=13,
-            tzinfo=timezone(timedelta(hours=1))
-        )
-        string = '2017-03-21 16:09:13 +0100'
-        # WHEN
-        date = DateUtil.str2date(string)
-        # THEN
-        assert date == expected
-
-    def test_date2str(self):
-        # GIVEN
-        expected = '2017-03-21 16:09:13 +0100'
-        dt = datetime(
-            year=2017,
-            month=3,
-            day=21,
-            hour=16,
-            minute=9,
-            second=13,
-            tzinfo=timezone(timedelta(hours=1))
-        )
-        # WHEN
-        string = DateUtil.date2str(dt)
-        # THEN
-        assert string == expected
+from smartchangelog import datetools
 
 
 class TestCommit:
@@ -51,7 +14,7 @@ class TestCommit:
         expected = Commit(
             id='a6f79b56acbb9e58327ecf91feed611bb614927f',
             author='Nicolas Gouzy <nicolas.gouzy@orange.com>',
-            date=DateUtil.str2date('2017-03-23 17:30:56 +0100'),
+            date=datetools.str2date('2017-03-23 17:30:56 +0100'),
             type=CommitType.refactor,
             scope='changelog',
             subject='better model',
@@ -104,7 +67,7 @@ class TestChangelog:
         expected_commit_with_scope = Commit(
             id='a6f79b56acbb9e58327ecf91feed611bb614927f',
             author='Nicolas Gouzy <nicolas.gouzy@orange.com>',
-            date=DateUtil.str2date('2017-03-23 17:30:56 +0100'),
+            date=datetools.str2date('2017-03-23 17:30:56 +0100'),
             type=CommitType.refactor,
             scope='changelog',
             subject="better model",
@@ -114,7 +77,7 @@ class TestChangelog:
         expected_commit_without_scope = Commit(
             id='597ec5676235e18f5a607726603df944da5be7fe',
             author='Nicolas Gouzy <nicolas.gouzy@orange.com>',
-            date=DateUtil.str2date('2017-03-22 15:28:45 +0100'),
+            date=datetools.str2date('2017-03-22 15:28:45 +0100'),
             type=None,
             scope=None,
             subject='Merge branch develop into master',

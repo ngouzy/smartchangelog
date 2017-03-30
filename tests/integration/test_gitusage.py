@@ -1,10 +1,10 @@
 import os
-import shutil
 import tempfile
 
 import pytest
 
-from tests.support import git_command
+from smartchangelog import githook
+from smartchangelog.tools import git_command
 
 
 @pytest.fixture(scope='function')
@@ -20,13 +20,7 @@ def temp_dir():
     git_command('config', 'user.name', 'Nicolas Gouzy')
     git_command('config', 'user.email', 'nicolas.gouzy@gmail.com')
 
-    git_hook_commit_msg_path = os.path.join(temporary_directory, ".git", "hooks", "commit-msg")
-    commitmsg_script_path = shutil.which("commit-msg")
-    assert os.path.isfile(commitmsg_script_path)
-    shutil.copy(commitmsg_script_path, git_hook_commit_msg_path)
-    assert os.path.isfile(git_hook_commit_msg_path)
-
-    os.chmod(git_hook_commit_msg_path, 0o755)
+    githook.install()
 
     git_command('add', '.')
 
