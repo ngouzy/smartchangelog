@@ -9,7 +9,7 @@ from typing import List, Iterator, TextIO, cast
 
 from smartchangelog.scripts import commitmsg_script
 
-"""Path of the file containing commitmsg module"""
+"""Path of the file containing commitmsg_script.py file"""
 commitmsg_script_path = inspect.getfile(commitmsg_script)
 
 

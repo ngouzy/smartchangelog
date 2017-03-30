@@ -58,6 +58,7 @@ setup(
     entry_points={
         'console_scripts': [
             'commit-msg=smartchangelog.scripts.commitmsg_script:main',
+            'smartchangelog=smartchangelog.scripts.changelog_script:main',
         ],
     },
 )

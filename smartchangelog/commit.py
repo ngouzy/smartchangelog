@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 
-from typing import NamedTuple
+from typing import NamedTuple, cast
 
 from smartchangelog import datetools
 from smartchangelog.commitmsg import CommitType, CommitMsg, CommitSyntaxError
@@ -74,5 +74,11 @@ class Commit(_Commit):
 
     @classmethod
     def property_name(cls, prop: property) -> str:
+        # fixme: change implementation, use _Commit.__dict__
         i = int(prop.__doc__.split(' ')[-1])
         return tuple(cls._fields)[i]
+
+    @classmethod
+    def property(cls, name: str):
+        prop = cast(property, _Commit.__dict__[name])
+        return prop

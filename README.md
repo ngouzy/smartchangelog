@@ -25,7 +25,7 @@ Now, you have a new command `commit-msg`
 Usage
 -----
 
-### commit-msg
+### commit-msg command
 
 To see the help:
 
@@ -38,3 +38,9 @@ To install git hook commit-msg, go to your git project directory:
 To uninstall git hook commit-msg, go to your git project directory:
 
 > `commit-msg -i`
+
+### smartchangelog command
+
+To see the help:
+
+> `smartchangelog -h`
