@@ -8,3 +8,6 @@ install:
 
 script:
   - pytest --cov-report term-missing --cov=smartchangelog/
+
+notifications:
+  email:
