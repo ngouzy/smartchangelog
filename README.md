@@ -14,28 +14,27 @@ To install python 3, you can use [homebrew](https://brew.sh):
 Installation
 ------------
 
-TODO
-
-Old documentation to remove
----------------------------
-
-### Installation 
-
 Clone this repository.
-To install this commit message syntax checker, you have to copy or make a symbolic link to your `.git/hooks` directory like that:
+Inside your cloned directory:
 
-> `cp commitmsg.py .git/hooks/commit-msg`
+> `pip3 install -U .`
 
-or
+Now, you have a new command `commit-msg`
 
-> `ln -s commitmsg.py .git/hooks/commit-msg`
 
-This script has to have `755` rights.
+Usage
+-----
 
-You may have to tune the shebang (the first line beginning by `#!`) of the script according to your python 3 path.
+### commit-msg
 
-### Usage
+To see the help:
 
-To see the usage:
+> `commit-msg -h`
 
-> `./commitmsg.py -h`
+To install git hook commit-msg, go to your git project directory:
+
+> `commit-msg -i`
+
+To uninstall git hook commit-msg, go to your git project directory:
+
+> `commit-msg -i`
