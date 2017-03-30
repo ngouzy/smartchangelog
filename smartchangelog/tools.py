@@ -1,26 +1,15 @@
 import inspect
 import os
-import subprocess
 import sys
 from contextlib import contextmanager
 from io import StringIO
 
-from typing import List, Iterator, TextIO, cast
+from typing import Iterator, TextIO, cast
 
 from smartchangelog.scripts import commitmsg_script
 
 """Path of the file containing commitmsg_script.py file"""
 commitmsg_script_path = inspect.getfile(commitmsg_script)
-
-
-def git_command(*git_args: str) -> subprocess.CompletedProcess:
-    args = ['git'] + cast(List[str], list(git_args))
-    completed_process = subprocess.run(args,
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE)
-    assert completed_process.returncode == 0
-    assert len(completed_process.stderr) == 0
-    return completed_process
 
 
 @contextmanager

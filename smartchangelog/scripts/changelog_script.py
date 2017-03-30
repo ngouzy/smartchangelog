@@ -1,5 +1,6 @@
 import argparse
 
+import smartchangelog.gitcmd
 from smartchangelog import __version__
 from smartchangelog import tools
 from smartchangelog.changelog import Changelog
@@ -17,7 +18,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    completed_process = tools.git_command("log", args.range, "--date", "iso")
+    completed_process = smartchangelog.gitcmd.git_command("log", args.range, "--date", "iso")
 
     log = completed_process.stdout.decode('utf-8')
     changelog = Changelog.parse(log)
