@@ -4,7 +4,7 @@ import tempfile
 import pytest
 
 from smartchangelog import githook
-from smartchangelog.gitcmd import git_command
+from smartchangelog.gitcmd import git_command, GitCmdError
 
 
 @pytest.fixture(scope='function')
@@ -34,17 +34,18 @@ def temp_dir():
 def test_git_commit_with_right_msg():
     # GIVEN
     # WHEN
-    completed_process = git_command('commit', '-m', 'feat(ui): sample')
+    result = git_command('commit', '-m', 'feat(ui): sample')
     # THEN
-    assert completed_process.returncode == 0
-    assert len(completed_process.stderr) == 0
+    assert result
 
 
 @pytest.mark.usefixtures("temp_dir")
 def test_git_commit_with_wrong_msg():
     # GIVEN
     # WHEN
-    completed_process = git_command('commit', '-m', 'wrong commit message')
-    # THEN
-    assert completed_process.returncode != 0
-    assert len(completed_process.stderr) > 0
+    with pytest.raises(GitCmdError):
+        git_command('commit', '-m', 'wrong commit message')
+        # THEN
+        pass
+
+
