@@ -7,4 +7,4 @@ install:
   - pip install .[test]
 
 script:
-  - pytest --cov-report term-missing --cov=smartchangelog
+  - pytest --cov-report term-missing --cov=smartchangelog/
