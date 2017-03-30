@@ -60,5 +60,5 @@ def test_get_tag():
     # WHEN
     tags = tag()
     # THEN
-    assert len(tags) > 0
+    assert len(tags) == 0
 
