@@ -1,7 +1,7 @@
 import os
 import pytest
 
-from smartchangelog.gitcmd import GitCmdError, is_inside_work_tree, get_gitdir
+from smartchangelog.gitcmd import GitCmdError, is_inside_work_tree, get_gitdir, tag
 from tests.unit import data_dir_path
 
 
@@ -52,4 +52,13 @@ def test_get_gitdir_ko():
         # THEN
         pass
 
+
+@pytest.mark.usefixtures('cmd')
+def test_get_tag():
+    # GIVEN
+    os.chdir(data_dir_path())
+    # WHEN
+    tags = tag()
+    # THEN
+    assert len(tags) > 0
 

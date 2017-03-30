@@ -37,3 +37,7 @@ def get_gitdir() -> str:
 
 def log(revision_range: str) -> str:
     return git_command("log", revision_range, "--date", "iso")
+
+
+def tag() -> List[str]:
+    return git_command("tag").split("\n")

@@ -5,6 +5,7 @@ import pytest
 import smartchangelog
 from smartchangelog.scripts import changelog_script
 from smartchangelog.tools import set_args
+from smartchangelog.gitcmd import tag
 
 """Path of the file containing changelog_script.py file"""
 changelog_script_path = inspect.getfile(changelog_script)
@@ -12,9 +13,9 @@ changelog_script_path = inspect.getfile(changelog_script)
 
 def test_range_arg():
     # GIVEN
-    with set_args(changelog_script_path, '--range', '0.0.1..0.0.8') as result, \
+    with set_args(changelog_script_path, '--range', revision_range()) as result, \
             pytest.raises(
-            SystemExit) as e:
+                SystemExit) as e:
         # WHEN
         changelog_script.main()
     stdout, stderr = result
@@ -26,9 +27,9 @@ def test_range_arg():
 
 def test_range_arg_with_groupby():
     # GIVEN
-    with set_args(changelog_script_path, '--range', '0.0.1..0.0.8', '--groupby', 'type', 'scope') as result, \
+    with set_args(changelog_script_path, '--range', revision_range(), '--groupby', 'type', 'scope') as result, \
             pytest.raises(
-            SystemExit) as e:
+                SystemExit) as e:
         # WHEN
         changelog_script.main()
     stdout, stderr = result
@@ -49,3 +50,10 @@ def test_version_arg():
     # THEN
     assert e.value.code == 0
     assert version == expected_version
+
+
+# Tools
+def revision_range() -> str:
+    tags = tag()
+    rev_range = "{start}..{end}".format(start=tags[0], end=tags[-1])
+    return rev_range
