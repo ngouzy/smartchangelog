@@ -1,7 +1,6 @@
 import pytest
 
 import smartchangelog.scripts.commitmsg
-from smartchangelog import commit
 from tests.support import set_args, set_commit_editmsg, commitmsg_script_path
 
 
@@ -52,3 +51,17 @@ def test_wrong_msg_file():
             smartchangelog.scripts.commitmsg.main()
         # THEN
         assert e.value.code != 0
+
+
+def test_version_arg():
+    # GIVEN
+    expected_version = smartchangelog.__version__
+    with set_args(commitmsg_script_path, "--version") as result, pytest.raises(SystemExit) as e:
+        # WHEN
+        smartchangelog.scripts.commitmsg.main()
+    stdout, stderr = result
+    version = stdout.read().strip("\n")
+    # THEN
+    assert e.value.code == 0
+    assert version == expected_version
+
