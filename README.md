@@ -14,10 +14,8 @@ To install python 3, you can use [homebrew](https://brew.sh):
 Installation
 ------------
 
-Clone this repository.
-Inside your cloned directory:
-
-> `pip3 install -U .`
+To install or to update the last version of smartchangelog:
+> `pip3 install -U smartchangelog`
 
 Now, you have new commands
  
@@ -34,13 +32,13 @@ To see the help:
 
 > `commit-msg -h`
 
-To install git hook commit-msg, go to your git project directory:
+To install git hook commit-msg, go to your project directory:
 
 > `commit-msg -i`
 
-To uninstall git hook commit-msg, go to your git project directory:
+To uninstall git hook commit-msg, go to your project directory:
 
-> `commit-msg -i`
+> `commit-msg -u`
 
 ### smartchangelog command
 
