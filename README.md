@@ -19,7 +19,10 @@ Inside your cloned directory:
 
 > `pip3 install -U .`
 
-Now, you have a new command `commit-msg`
+Now, you have new commands
+ 
+* `commit-msg`
+* `smartchangelog`
 
 
 Usage
