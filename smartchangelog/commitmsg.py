@@ -42,10 +42,8 @@ class CommitMsg:
     """
     Your commit message have to follow this format:
     <type>(<scope>): <subject>
-
     <body>
 
-    <footer>
     Where :
     Message first line (type, scope and subject)
         The first line cannot be longer than {firstline_max_length} characters.
@@ -64,30 +62,20 @@ class CommitMsg:
         omitted.
 
     Message body (optional)
-        If there is a body, it must have a blank line between the first line and
-        the body.
         The body cannot be longer than {bodyline_max_length} characters.
         uses the imperative, present tense: "change" not "changed" nor
         "changes"
         includes motivation for the change and contrasts with previous behavior
-
-    Message footer
-        Referencing issues or user stories (Jira references)
-        If there is a footer, it must have a body and it must have a blank line between the body and
-        the footer.
-        The footer cannot be longer than {footerline_max_length} characters.
     """
     FIRSTLINE_PATTERN = re.compile('^([a-z]+)(?:\(([^\n\t]+)\))?: (.+)$')
     FIRSTLINE_MAX_LENGTH = 70
     BODY_MAX_LENGTH = 80
-    FOOTER_MAX_LENGTH = 80
 
-    def __init__(self, msg_type: CommitType, scope: str, subject: str, body: str = None, footer: str = None) -> None:
+    def __init__(self, msg_type: CommitType, scope: str, subject: str, body: str = None) -> None:
         self.type = msg_type
         self.scope = scope
         self.subject = subject
         self.body = body
-        self.footer = footer
 
     def __eq__(self, other) -> bool:
         if isinstance(other, self.__class__):
@@ -96,19 +84,14 @@ class CommitMsg:
 
     @classmethod
     def parse(cls, msg: str) -> 'CommitMsg':
-        msg_parts = msg.split("\n\n")
+        msg_parts = msg.split("\n", maxsplit=1)
         firstline = cls.parse_firstline(msg_parts[0])
         if len(msg_parts) > 1:
             body = msg_parts[1]
             cls.parse_body(body)
         else:
             body = None
-        if len(msg_parts) > 2:
-            footer = msg_parts[2]
-            cls.parse_footer(footer)
-        else:
-            footer = None
-        return cls(firstline.type, firstline.scope, firstline.subject, body, footer)
+        return cls(firstline.type, firstline.scope, firstline.subject, body)
 
     @classmethod
     def parse_firstline(cls, firstline: str) -> FirstLine:
@@ -116,8 +99,6 @@ class CommitMsg:
             raise CommitSyntaxError("First line can not be greater than {length} characters".format(
                 length=cls.FIRSTLINE_MAX_LENGTH))
         result = cls.FIRSTLINE_PATTERN.search(firstline)
-        if "\n" in firstline.strip():
-            raise CommitSyntaxError("Two blank lines have to separate the first line and body part")
         if result is None:
             raise CommitSyntaxError("{firstline} doesn't follow the first line commit message pattern: {pattern}"
                                     .format(firstline=firstline, pattern=cls.FIRSTLINE_PATTERN.pattern))
@@ -137,14 +118,6 @@ class CommitMsg:
         return body
 
     @classmethod
-    def parse_footer(cls, footer: str) -> str:
-        for line in footer.split('\n'):
-            if len(line) > cls.FOOTER_MAX_LENGTH:
-                raise CommitSyntaxError("Footer line can not be greater than {length} characters".format(
-                    length=cls.FOOTER_MAX_LENGTH))
-        return footer
-
-    @classmethod
     def format_allowed_types(cls) -> str:
         return "\n" + "\n".join("\t* {name}: {doc}".format(name=ct.name, doc=ct.value) for ct in CommitType)
 
@@ -152,6 +125,5 @@ class CommitMsg:
     def help(cls) -> str:
         return inspect.getdoc(cls).format(allowed_types=cls.format_allowed_types(),
                                           firstline_max_length=cls.FIRSTLINE_MAX_LENGTH,
-                                          bodyline_max_length=cls.BODY_MAX_LENGTH,
-                                          footerline_max_length=cls.FOOTER_MAX_LENGTH)
+                                          bodyline_max_length=cls.BODY_MAX_LENGTH)
 

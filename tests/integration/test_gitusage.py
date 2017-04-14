@@ -1,22 +1,18 @@
 import os
+import shutil
 import tempfile
 
 import pytest
 
 from smartchangelog import githook
 from smartchangelog.gitcmd import git_command, GitCmdError
+# noinspection PyUnresolvedReferences
+from tests.integration import temp_dir
 
 
 @pytest.fixture(scope='function')
-def temp_dir():
-    temporary_directory = tempfile.mkdtemp()
-    old_cwd = os.getcwd()
-    os.chdir(temporary_directory)
-
-    git_command('init')
-    git_command('config', 'user.name', 'Nicolas Gouzy')
-    git_command('config', 'user.email', 'nicolas.gouzy@gmail.com')
-
+def add_sample_file(temp_dir):
+    temporary_directory = temp_dir
     githook.install()
 
     sample_file_path = os.path.join(temporary_directory, "sample_file.txt")
@@ -27,10 +23,8 @@ def temp_dir():
 
     yield None
 
-    os.chdir(old_cwd)
 
-
-@pytest.mark.usefixtures("temp_dir")
+@pytest.mark.usefixtures("add_sample_file")
 def test_git_commit_with_right_msg():
     # GIVEN
     # WHEN
@@ -39,7 +33,7 @@ def test_git_commit_with_right_msg():
     assert result
 
 
-@pytest.mark.usefixtures("temp_dir")
+@pytest.mark.usefixtures("add_sample_file")
 def test_git_commit_with_wrong_msg():
     # GIVEN
     # WHEN
@@ -47,5 +41,3 @@ def test_git_commit_with_wrong_msg():
         git_command('commit', '-m', 'wrong commit message')
         # THEN
         pass
-
-

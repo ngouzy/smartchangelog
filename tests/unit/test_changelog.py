@@ -17,8 +17,7 @@ class TestChangelog:
             type=CommitType.refactor,
             scope='changelog',
             subject="better model",
-            body='NamedTuple rocks !',
-            footer=None
+            body='NamedTuple rocks !'
         )
         expected_commit_without_scope = Commit(
             id='597ec5676235e18f5a607726603df944da5be7fe',
@@ -27,8 +26,7 @@ class TestChangelog:
             type=None,
             scope=None,
             subject='Merge branch develop into master',
-            body=None,
-            footer=None
+            body=None
         )
         # WHEN
         changelog = Changelog.parse(log)

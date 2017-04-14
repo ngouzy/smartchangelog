@@ -76,35 +76,8 @@ class TestCommitMsg:
             # THEN
             assert actual == body
 
-    class TestParseFooter:
-        def test_with_too_long_footer_line_length(self):
-            # GIVEN
-            footer = "footer\n" + \
-                     "f" * (CommitMsg.FOOTER_MAX_LENGTH + 1)
-            with pytest.raises(CommitSyntaxError):
-                # WHEN
-                CommitMsg.parse_footer(footer)
-                # THEN CommitSyntaxError is raised
-
-        def test_with_one_line_footer(self):
-            # GIVEN
-            footer = "footer"
-            # WHEN
-            actual = CommitMsg.parse_footer(footer)
-            # THEN
-            assert actual == footer
-
-        def test_with_multi_line_footer(self):
-            # GIVEN
-            footer = "first line footer\n" + \
-                     "second line footer"
-            # WHEN
-            actual = CommitMsg.parse_footer(footer)
-            # THEN
-            assert actual == footer
-
     class TestParse:
-        def test_with_firstline_but_without_body_and_footer(self):
+        def test_with_firstline_but_without_body(self):
             # GIVEN
             msg = "feat: add button"
             # WHEN
@@ -114,13 +87,11 @@ class TestCommitMsg:
             assert commit_msg.scope is None
             assert commit_msg.subject == "add button"
             assert commit_msg.body is None
-            assert commit_msg.footer is None
 
-        def test_with_firstline_and_body_but_without_footer(self):
+        def test_with_firstline_and_body(self):
             # GIVEN
             msg = "" + \
                   "feat(ui): add button\n" + \
-                  "\n" + \
                   "body first line\n" + \
                   "body second line"
             # WHEN
@@ -130,32 +101,6 @@ class TestCommitMsg:
             assert commit_msg.scope == "ui"
             assert commit_msg.subject == "add button"
             assert commit_msg.body == "body first line\nbody second line"
-            assert commit_msg.footer is None
-
-        def test_with_firstline_and_body_and_footer(self):
-            # GIVEN
-            msg = "feat(ui): add button\n" + \
-                  "\n" + \
-                  "body\n" + \
-                  "\n" + \
-                  "footer"
-            # WHEN
-            commit_msg = CommitMsg.parse(msg)
-            # THEN
-            assert commit_msg.type == CommitType.feat
-            assert commit_msg.scope == "ui"
-            assert commit_msg.subject == "add button"
-            assert commit_msg.body == "body"
-            assert commit_msg.footer == "footer"
-
-        def test_wrong_msg_with_bad_separator_between_firstline_and_body(self):
-            # GIVEN
-            msg = "feat(ui): add button\n" + \
-                  "body"
-            with pytest.raises(CommitSyntaxError) as e:
-                # WHEN
-                CommitMsg.parse(msg)
-                # THEN CommitSyntaxError is raised
 
     class TestEquality:
         def test_equality_with_same_commitmsg(self):

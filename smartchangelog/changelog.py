@@ -63,7 +63,6 @@ class Node:
     def print_leaf(cls, commit: Commit, file: IO) -> None:
         print("* subject: {subject}".format(subject=commit.subject or ''), file=file)
         cls.print_multilines(name='body', value=commit.body, file=file)
-        cls.print_multilines(name='footer', value=commit.footer, file=file)
         print("    * date: {date}".format(date=datetools.date2str(commit.date)), file=file)
         print("    * author: {author}".format(author=commit.author), file=file)
         print("    * commit: {id}".format(id=commit.id), file=file)

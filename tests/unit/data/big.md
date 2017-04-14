@@ -86,9 +86,6 @@
 
 * subject: test equality of CommitMsg
     * body: body
-    * footer:
-        - footer 1
-        - footer 2
     * date: 2017-03-22 11:13:14 +0100
     * author: Nicolas Gouzy <nicolas.gouzy@orange.com>
     * commit: 9b88c7c7c7b055a571cd1cfa26a8927623ce2c9f
@@ -165,7 +162,6 @@
         - body 1
         - body 2
         - body 3
-    * footer: footer
     * date: 2017-03-22 11:15:14 +0100
     * author: Nicolas Gouzy <nicolas.gouzy@orange.com>
     * commit: 82e3d1519ca2dbd39c15796dd2c8e613e1155961
@@ -240,7 +236,6 @@
     * body:
         - use @classmethod instead of @staticmethod
         - body2
-        - footer
     * date: 2017-03-22 11:10:52 +0100
     * author: Nicolas Gouzy <nicolas.gouzy@orange.com>
     * commit: ea72e1939ec55afda9ce04e1b94708710da53253

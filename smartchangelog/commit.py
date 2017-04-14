@@ -15,7 +15,6 @@ class _Commit(NamedTuple):
     scope: str = None
     subject: str = None
     body: str = None
-    footer: str = None
 
 
 class Commit(_Commit):
@@ -24,7 +23,6 @@ class Commit(_Commit):
         scope: str = None
         subject: str = None
         body: str = None
-        footer: str = None
 
     @classmethod
     def parse(cls, commit: str) -> 'Commit':
@@ -43,8 +41,7 @@ class Commit(_Commit):
             type=message.type,
             scope=message.scope,
             subject=message.subject,
-            body=message.body,
-            footer=message.footer
+            body=message.body
         )
 
     @classmethod
@@ -68,8 +65,7 @@ class Commit(_Commit):
                 type=None,
                 scope=None,
                 subject=subject,
-                body=body,
-                footer=None
+                body=body
             )
 
     @classmethod

@@ -3,7 +3,6 @@ Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
 Date:   2017-03-23 17:30:56 +0100
 
     refactor(changelog): better model
-
     NamedTuple rocks !
 
 commit 597ec5676235e18f5a607726603df944da5be7fe
@@ -17,10 +16,7 @@ Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
 Date:   2017-03-22 11:15:14 +0100
 
     test(static): change log is now under mypy check
-
     body
-
-    footer
 
 commit d71b99d86402f196f3f1b9f0cd7020e9ba69bd85
 Author: Nicolas Gouzy <nicolas.gouzy@orange.com>
