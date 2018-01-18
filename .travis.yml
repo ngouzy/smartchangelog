@@ -5,9 +5,13 @@ python:
 
 install:
   - pip install .[test]
+  - pip install coveralls
 
 script:
   - pytest --cov-report term-missing --cov=smartchangelog/
 
 notifications:
   email:
+
+after_success:
+  - coveralls

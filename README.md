@@ -2,6 +2,7 @@ smartchangelog: tools to generate smart changelog
 =================================================
 
 [![Build Status](https://travis-ci.org/ngouzy/smartchangelog.svg)](https://travis-ci.org/ngouzy/smartchangelog)
+[![Coverage Status](https://coveralls.io/repos/github/ngouzy/smartchangelog/badge.svg?branch=master)](https://coveralls.io/github/ngouzy/smartchangelog?branch=master)
 
 Requirements
 ------------
