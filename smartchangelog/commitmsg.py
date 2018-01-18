@@ -2,7 +2,7 @@ import inspect
 import re
 from enum import Enum
 
-from typing import NamedTuple
+from typing import NamedTuple, Optional, Any
 
 
 class CommitSyntaxError(Exception):
@@ -20,15 +20,15 @@ class CommitType(Enum):
     test = 'adding missing tests, refactoring tests; no production code change'
     chore = 'updating gradle scripts, continuous integration scripts,  etc; no production code change'
 
-    def __lt__(self, other):
-        if isinstance(other, self.__class__):
+    def __lt__(self, other: Any) -> bool:
+        if isinstance(other, CommitType):
             return self.index() < other.index()
         return NotImplemented
 
-    def index(self):
+    def index(self) -> int:
         return [ct for ct in CommitType].index(self)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -77,7 +77,7 @@ class CommitMsg:
         self.subject = subject
         self.body = body
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
         return NotImplemented
